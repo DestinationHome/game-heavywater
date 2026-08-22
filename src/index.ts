@@ -11,6 +11,7 @@ import { serializeError } from "serialize-error";
 import { EmoRayService } from "./services/emoray/service";
 import { RcRallyService } from "./services/rcrally/service";
 import { AvalonService } from "./services/avalon/service";
+import { HeavyWaterPublicService } from "./services/public/service";
 
 const app = new Hono();
 
@@ -24,7 +25,12 @@ app.use(async (c, next) => {
   await next();
 });
 
-const services = [new EmoRayService(), new RcRallyService(), new AvalonService()];
+const services = [
+  new EmoRayService(),
+  new RcRallyService(),
+  new AvalonService(),
+  new HeavyWaterPublicService(),
+];
 
 // middleware and logging
 export const log = new LogLayer({

@@ -74,5 +74,15 @@ sqlite.run(`
   );
 `);
 
+sqlite.run(`
+  CREATE TABLE IF NOT EXISTS heavywater_public_metrics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uuid TEXT,
+    version TEXT,
+    data TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  );
+`);
+
 export const db = drizzle(sqlite, { schema });
 export * from "./schema";

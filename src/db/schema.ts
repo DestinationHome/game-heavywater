@@ -51,3 +51,11 @@ export const avalonContributions = sqliteTable("avalon_contributions", {
   amount: integer("amount").notNull().default(0),
   updatedAt: integer("updated_at").notNull(),
 });
+
+export const heavywaterPublicMetrics = sqliteTable("heavywater_public_metrics", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  uuid: text("uuid"),
+  version: text("version"),
+  data: text("data").notNull(), // JSON
+  createdAt: integer("created_at").notNull(),
+});
