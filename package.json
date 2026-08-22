@@ -1,5 +1,5 @@
 {
-  "name": "psh-emoray",
+  "name": "psh-heavywater",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "start": "bun run src/index.ts",

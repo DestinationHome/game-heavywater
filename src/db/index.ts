@@ -4,7 +4,7 @@ import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import * as schema from "./schema";
 
-const dbPath = process.env.DATABASE_URL?.replace("file:", "") || "data/emoray.db";
+const dbPath = process.env.DATABASE_URL?.replace("file:", "") || "data/heavywater.db";
 mkdirSync(dirname(dbPath), { recursive: true });
 
 const sqlite = new Database(dbPath);

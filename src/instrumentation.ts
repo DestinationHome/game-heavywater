@@ -31,7 +31,7 @@ if (!globalThis.__otel_initialized__) {
   // Define Resource merging default resources with custom ones
   const resource = defaultResource().merge(
     resourceFromAttributes({
-      [ATTR_SERVICE_NAME]: "psh-emoray",
+      [ATTR_SERVICE_NAME]: "psh-heavywater",
       [ATTR_SERVICE_VERSION]: "1.0",
     }),
   );

@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: destinationhome/game-emoray
+  IMAGE_NAME: destinationhome/game-heavywater
 
 jobs:
   build-and-push:

@@ -38,7 +38,7 @@ describe("EmoRay API Endpoints", () => {
     // Account ID at 0x48
     ticketBuf.writeBigUInt64BE(1234567890n, 0x48);
     // Username at 0x54..0x74
-    ticketBuf.write("ZephyrTester", 0x54, "utf8");
+    ticketBuf.write("ThisIsSparta", 0x54, "utf8");
     // Region at 0x78
     ticketBuf.write("eu", 0x78, "utf8");
     // Domain at 0x80
@@ -62,7 +62,7 @@ describe("EmoRay API Endpoints", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.STATUS).toBe("SUCCESS");
-    expect(body.result.d2oID).toBe("ZephyrTester");
+    expect(body.result.d2oID).toBe("ThisIsSparta");
   });
 
   it("Metrics submission succeeds", async () => {

@@ -1,15 +1,15 @@
 <div align="center">
 
-  <h1>🧸 <code>psh-emoray</code> 🚗</h1>
+  <h1>🌊 <code>psh-heavywater</code> 🕹️</h1>
 
   <p>
-    <strong>Backend API service for the PlayStation Home minigame <em>Emo Ray vs. Intergalactic Teddy Bears</em> (Heavy Water / D2O).</strong>
+    <strong>Backend API service for Heavy Water / D2O PlayStation Home spaces and minigames.</strong>
   </p>
 
   <p>
-    <a href="https://github.com/DestinationHome/game-emoray/actions/workflows/lint.yml"><img src="https://img.shields.io/github/actions/workflow/status/DestinationHome/game-emoray/lint.yml?branch=main&style=flat-square&label=lint%20%26%20tests" alt="Lint & Tests Status"></a>
-    <a href="https://github.com/DestinationHome/game-emoray/actions/workflows/docker.yml"><img src="https://img.shields.io/github/actions/workflow/status/DestinationHome/game-emoray/docker.yml?branch=main&style=flat-square&label=build" alt="Build Status"></a>
-    <a href="https://github.com/DestinationHome/game-emoray/pkgs/container/game-emoray"><img src="https://img.shields.io/badge/docker-ghcr.io-blue?style=flat-square&logo=docker" alt="Docker Image"></a>
+    <a href="https://github.com/DestinationHome/game-heavywater/actions/workflows/lint.yml"><img src="https://img.shields.io/github/actions/workflow/status/DestinationHome/game-heavywater/lint.yml?branch=main&style=flat-square&label=lint%20%26%20tests" alt="Lint & Tests Status"></a>
+    <a href="https://github.com/DestinationHome/game-heavywater/actions/workflows/docker.yml"><img src="https://img.shields.io/github/actions/workflow/status/DestinationHome/game-heavywater/docker.yml?branch=main&style=flat-square&label=build" alt="Build Status"></a>
+    <a href="https://github.com/DestinationHome/game-heavywater/pkgs/container/game-heavywater"><img src="https://img.shields.io/badge/docker-ghcr.io-blue?style=flat-square&logo=docker" alt="Docker Image"></a>
     <a href="#license"><img src="https://img.shields.io/badge/license-GPLv3-blue?style=flat-square" alt="License"></a>
   </p>
 
@@ -21,17 +21,27 @@
 
 - [@zeph](https://github.com/ZephyrCodesStuff)
 
+## 🚧 Supported Spaces & Games
+
+- [x] **Emo Ray vs. Intergalactic Teddy Bears** (Day One)
+  - Story & mission progression
+  - Equipped weapon loadouts & mod parts
+  - Vehicle upgrades, decals, and store progress
+  - Session metrics & score tracking
+  - Controller camera & sensitivity configurations
+- [ ] **Heavy Water Avalon Sub / Casino & Spaces** *(Upcoming)*
+
 ## 🌠 Features
 
-- 🎮 **Complete EmoRay Support**: Handles story & mission progression, equipped mod loadouts, vehicle slots, weapon upgrades, scores, controller bindings, and garage store states.
-- 💾 **SQLite Persistence**: Powered by [Drizzle ORM](https://orm.drizzle.team) and Bun SQLite with built-in default initialization seeded from the original client scripts.
-- 🪵 **Modern Observability**: LogLayer, Pino pretty logging, and OpenTelemetry OTLP tracing / log exporting.
+- 🎟️ **Sony NP Ticket Parsing**: Binary layout decoding (based on `npticket-rs`) extracting PSN username, account ID, and region.
+- 💾 **SQLite Persistence**: Powered by [Drizzle ORM](https://orm.drizzle.team) and Bun SQLite with built-in default initialization.
+- 🪵 **Observability**: LogLayer, Pino pretty logging, and OpenTelemetry OTLP tracing / log exporting.
 
 ---
 
 ## 🌐 Required Domains
 
-Route the following domains through your DNS / reverse proxy to this container (default port `30086`):
+Route the following domains through your DNS / reverse proxy to this container (default port `30082`):
 
 | Domain | Protocol | Purpose |
 | :--- | :--- | :--- |
@@ -40,7 +50,7 @@ Route the following domains through your DNS / reverse proxy to this container (
 | `www.services.heavyh2o.net` | HTTP | Client fallback / standard base URL |
 
 > [!TIP]
-> Use [**mallory-rs**](https://github.com/ZephyrCodesStuff/mallory-rs) to easily debug and proxy HTTPS/TLS requests from the client.
+> Use [**mallory-rs**](https://github.com/ZephyrCodesStuff/mallory-rs) to easily debug and proxy HTTPS/TLS requests from the PS3 client.
 
 ---
 
@@ -58,9 +68,10 @@ Route the following domains through your DNS / reverse proxy to this container (
    bun run dev
    ```
 
-3. **Run unit tests:**
+3. **Run unit tests & linting:**
    ```bash
    bun test
+   bun run lint
    ```
 
 ---
@@ -73,4 +84,4 @@ Run with Docker Compose:
 docker compose up -d
 ```
 
-The service will start listening on port `30086`.
+The service will start listening on port `30082`.
