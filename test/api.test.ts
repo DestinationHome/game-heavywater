@@ -11,7 +11,7 @@ describe("EmoRay API Endpoints", () => {
     expect(body.status).toBe("ok");
   });
 
-  it("NP Ticket validation succeeds and returns expected schema", async () => {
+  it("NP Ticket validation succeeds with mock text and returns expected schema", async () => {
     const res = await app.fetch(
       new Request("http://localhost/D2O/Ticket/validate/NPUR00052_00/", {
         method: "POST",
@@ -25,6 +25,44 @@ describe("EmoRay API Endpoints", () => {
     expect(body.result).toBeDefined();
     expect(body.result.d2oID).toBeDefined();
     expect(body.result.environment).toBe("Development");
+  });
+
+  it("NP Ticket validation extracts username from valid binary ticket", async () => {
+    const ticketBuf = Buffer.alloc(220);
+    // Version 3.0 (0x3100)
+    ticketBuf.writeUInt16BE(0x3100, 0x00);
+    // Serial at 0x10
+    ticketBuf.write("TEST-SERIAL-0001", 0x10, "utf8");
+    // Issuer at 0x28
+    ticketBuf.writeUInt32BE(1001, 0x28);
+    // Account ID at 0x48
+    ticketBuf.writeBigUInt64BE(1234567890n, 0x48);
+    // Username at 0x54..0x74
+    ticketBuf.write("ZephyrTester", 0x54, "utf8");
+    // Region at 0x78
+    ticketBuf.write("eu", 0x78, "utf8");
+    // Domain at 0x80
+    ticketBuf.write("np", 0x80, "utf8");
+    // Service ID at 0x88
+    ticketBuf.write("NPUR00052_00", 0x88, "utf8");
+
+    const formData = new FormData();
+    formData.append(
+      "base64-ticket",
+      new Blob([ticketBuf], { type: "application/octet-stream" }),
+      "ticket.bin",
+    );
+
+    const res = await app.fetch(
+      new Request("http://localhost/D2O/Ticket/validate/NPUR00052_00/", {
+        method: "POST",
+        body: formData,
+      }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.STATUS).toBe("SUCCESS");
+    expect(body.result.d2oID).toBe("ZephyrTester");
   });
 
   it("Metrics submission succeeds", async () => {

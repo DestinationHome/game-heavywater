@@ -8,7 +8,7 @@ export interface ApiResponse<T = unknown> {
 }
 
 /**
- * Standard DRY response wrapper for successful EmoRay API requests.
+ * Response wrapper for successful EmoRay API requests.
  */
 export function apiSuccess<T>(c: Context, result: T, status: StatusCode = 200) {
   return c.json<ApiResponse<T>>(
@@ -21,7 +21,7 @@ export function apiSuccess<T>(c: Context, result: T, status: StatusCode = 200) {
 }
 
 /**
- * Standard DRY response wrapper for failed EmoRay API requests.
+ * Response wrapper for failed EmoRay API requests.
  */
 export function apiError(
   c: Context,

@@ -37,7 +37,6 @@ export const log = new LogLayer({
     }),
     new OpenTelemetryTransport(),
   ],
-  // @ts-expect-error The types are correct
   plugins: [openTelemetryPlugin()],
 });
 
