@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "es2022",
+    "target": "es2022",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "types": ["bun-types"],
+    "paths": {
+      "@main": ["./src/index.ts"],
+      "@db": ["./src/db/index.ts"],
+      "@defaults/*": ["./src/defaults/*"],
+      "@common/*": ["./src/common/*"]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+services:
+  emoray:
+    image: ghcr.io/destinationhome/game-emoray:latest
+    container_name: game-emoray
+    restart: unless-stopped
+    user: "1002:1002"
+    volumes:
+      - /srv/destinationhome/private/emoray/data:/app/data
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://172.17.0.1:4318
+      - PORT=3000
+    ports:
+      - "30082:3000"
