@@ -2,6 +2,7 @@ import type { Context, Hono } from "hono";
 import { log } from "@main";
 import { apiXml } from "../../../common/xml";
 import { getUserData, getAllUsers } from "../store";
+import { compressObjectives, compressParts } from "../bitcompressor";
 import type { RcRallyUserData } from "../types";
 
 export const RCR_PUBLISHER_ID = "12";
@@ -78,30 +79,11 @@ export function gdoRoutes(app: Hono) {
     const t2 = bestTimeMs(u, "2");
     const t3 = bestTimeMs(u, "3");
 
-    // Format Parts
-    const partsEntries = Object.entries(u.parts || {});
-    const partsNode = partsEntries.length > 0
-      ? {
-          type: partsEntries.map(([name, id]) => ({
-            "@_name": name,
-            id,
-          })),
-        }
-      : "";
-
-    // Format Objectives
-    const objectivesEntries = Object.entries(u.objectives || {});
-    const objectivesNode = objectivesEntries.length > 0
-      ? {
-          id: objectivesEntries.map(([id, count]) => ({
-            "@_count": count,
-            "#text": id,
-          })),
-        }
-      : "";
+    const partsCompressed = compressParts(u.parts);
+    const objectivesCompressed = compressObjectives(u.objectives);
 
     log.info(
-      `[GDO] user/game user=${user} tracks=[${t1}, ${t2}, ${t3}] parts=${partsEntries.length} objectives=${objectivesEntries.length}`,
+      `[GDO] user/game user=${user} tracks=[${t1}, ${t2}, ${t3}] parts=${partsCompressed} objectives=${objectivesCompressed}`,
     );
 
     return apiXml(c, {
@@ -121,12 +103,12 @@ export function gdoRoutes(app: Hono) {
               Track1_Times: t1,
               Track2_Times: t2,
               Track3_Times: t3,
-              Loadout1: "",
-              Loadout2: "",
-              Loadout3: "",
-              Parts: partsNode,
-              Objectives: objectivesNode,
-              Total_Time: "",
+              Loadout1: "AAAAAAAA",
+              Loadout2: "AAAAAAAA",
+              Loadout3: "AAAAAAAA",
+              Parts: partsCompressed,
+              Objectives: objectivesCompressed,
+              Total_Time: 0,
             },
           },
         },

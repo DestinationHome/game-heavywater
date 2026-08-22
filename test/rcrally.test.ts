@@ -135,17 +135,16 @@ describe("RC Rally & GDO Endpoints", () => {
     );
     expect(objRes.status).toBe(200);
 
-    // Verify user/game contains populated Parts and Objectives
+    // Verify user/game contains compressed Parts and Objectives
     const gameRes = await app.fetch(
       new Request(
         `http://localhost/user/game/12/7/en_US/${testUser}`,
       ),
     );
     const gameText = await gameRes.text();
-    expect(gameText).toContain('<type name="Body"><id>2</id></type>');
-    expect(gameText).toContain('<type name="Wheels"><id>4</id></type>');
-    expect(gameText).toContain('<id count="1">RedCupsOnly_T1</id>');
-    expect(gameText).toContain('<id count="2">BeatPreviousTime_T1</id>');
+    expect(gameText).toContain("<Objectives>17</Objectives>");
+    expect(gameText).toContain("<Parts>");
+    expect(gameText).toContain("<Loadout1>AAAAAAAA</Loadout1>");
   });
 
   it("GET /leaderboard returns sorted player scores", async () => {
