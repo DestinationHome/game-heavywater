@@ -46,7 +46,31 @@ export function gdoRoutes(app: Hono) {
     const t2 = bestTimeMs(u, "2");
     const t3 = bestTimeMs(u, "3");
 
-    log.info(`[GDO] user/game user=${user} tracks=[${t1}, ${t2}, ${t3}]`);
+    // Format Parts
+    const partsEntries = Object.entries(u.parts || {});
+    const partsNode = partsEntries.length > 0
+      ? {
+          type: partsEntries.map(([name, id]) => ({
+            "@_name": name,
+            id,
+          })),
+        }
+      : "";
+
+    // Format Objectives
+    const objectivesEntries = Object.entries(u.objectives || {});
+    const objectivesNode = objectivesEntries.length > 0
+      ? {
+          id: objectivesEntries.map(([id, count]) => ({
+            "@_count": count,
+            "#text": id,
+          })),
+        }
+      : "";
+
+    log.info(
+      `[GDO] user/game user=${user} tracks=[${t1}, ${t2}, ${t3}] parts=${partsEntries.length} objectives=${objectivesEntries.length}`,
+    );
 
     return apiXml(c, {
       root: {
@@ -68,8 +92,8 @@ export function gdoRoutes(app: Hono) {
               Loadout1: "",
               Loadout2: "",
               Loadout3: "",
-              Parts: "",
-              Objectives: "",
+              Parts: partsNode,
+              Objectives: objectivesNode,
               Total_Time: "",
             },
           },
@@ -81,12 +105,34 @@ export function gdoRoutes(app: Hono) {
   app.get("/user/game/:pub/:game/:locale/:user/", handleUserGame);
 
   // 3. User Space / Quests
-  const handleUserSpace = (c: Context) => {
+  const handleUserSpace = async (c: Context) => {
     const space = c.req.param("space");
     const locale = c.req.param("locale");
     const user = c.req.param("user");
 
-    log.info(`[GDO] user/space space=${space} user=${user}`);
+    const u = await getUserData(user);
+    const objKeys = Object.keys(u.objectives || {});
+
+    const questsNode = objKeys.length > 0
+      ? {
+          quest: objKeys.map((id) => ({
+            "@_id": id,
+            name: id,
+          })),
+        }
+      : "";
+
+    const publisherQuestsNode = objKeys.length > 0
+      ? {
+          quest: objKeys.map((id) => ({
+            "@_id": id,
+            status: "completed",
+            completed_timestamp: "2026.01.01 00:00:00",
+          })),
+        }
+      : "";
+
+    log.info(`[GDO] user/space space=${space} user=${user} quests=${objKeys.length}`);
 
     return apiXml(c, {
       root: {
@@ -94,7 +140,7 @@ export function gdoRoutes(app: Hono) {
           publisher: {
             "@_id": 12,
             groups: "",
-            quests: "",
+            quests: questsNode,
           },
         },
         documents: {
@@ -111,7 +157,7 @@ export function gdoRoutes(app: Hono) {
               },
             },
           },
-          publisher_quests: "",
+          publisher_quests: publisherQuestsNode,
         },
       },
     });

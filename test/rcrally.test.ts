@@ -134,6 +134,18 @@ describe("RC Rally & GDO Endpoints", () => {
       }),
     );
     expect(objRes.status).toBe(200);
+
+    // Verify user/game contains populated Parts and Objectives
+    const gameRes = await app.fetch(
+      new Request(
+        `http://localhost/user/game/12/7/en_US/${testUser}`,
+      ),
+    );
+    const gameText = await gameRes.text();
+    expect(gameText).toContain('<type name="Body"><id>2</id></type>');
+    expect(gameText).toContain('<type name="Wheels"><id>4</id></type>');
+    expect(gameText).toContain('<id count="1">RedCupsOnly_T1</id>');
+    expect(gameText).toContain('<id count="2">BeatPreviousTime_T1</id>');
   });
 
   it("GET /leaderboard returns sorted player scores", async () => {
@@ -157,6 +169,8 @@ describe("RC Rally & GDO Endpoints", () => {
     const spaceText = await spaceRes.text();
     expect(spaceText).toContain(`<np_online_id>${testUser}</np_online_id>`);
     expect(spaceText).toContain('<scene id="heavywater_rcrally_game">');
+    expect(spaceText).toContain('<quest id="RedCupsOnly_T1">');
+    expect(spaceText).toContain("<status>completed</status>");
 
     const syncRes = await app.fetch(
       new Request(
