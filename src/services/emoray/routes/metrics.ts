@@ -27,5 +27,7 @@ export function metricsRoutes(app: Hono) {
   };
 
   app.put("/D2O/EmoRay/metrics", handleMetrics);
+  app.put("/D2O/EmoRay/metrics/", handleMetrics);
   app.post("/D2O/EmoRay/metrics", handleMetrics);
+  app.post("/D2O/EmoRay/metrics/", handleMetrics);
 }

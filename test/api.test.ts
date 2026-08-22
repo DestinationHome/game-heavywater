@@ -27,6 +27,17 @@ describe("EmoRay API Endpoints", () => {
     expect(body.result.environment).toBe("Development");
   });
 
+  it("POST & GET /D2O/Ticket/validate/:gameId succeeds", async () => {
+    const getRes = await app.fetch(
+      new Request("http://localhost/D2O/Ticket/validate/NPUR00052_00/"),
+    );
+    expect(getRes.status).toBe(200);
+    const getBody = await getRes.json();
+    expect(getBody.STATUS).toBe("SUCCESS");
+    expect(getBody.result.d2oID).toBeDefined();
+    expect(getBody.result.environment).toBe("Development");
+  });
+
   it("NP Ticket validation extracts username from valid binary ticket", async () => {
     const ticketBuf = Buffer.alloc(220);
     // Version 3.0 (0x3100)
