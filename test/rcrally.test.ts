@@ -167,6 +167,7 @@ describe("RC Rally & GDO Endpoints", () => {
     );
     expect(spaceRes.status).toBe(200);
     const spaceText = await spaceRes.text();
+    expect(spaceText).toContain("<status>success</status>");
     expect(spaceText).toContain(`<np_online_id>${testUser}</np_online_id>`);
     expect(spaceText).toContain('<scene id="heavywater_rcrally_game">');
     expect(spaceText).toContain('<quest id="RedCupsOnly_T1">');

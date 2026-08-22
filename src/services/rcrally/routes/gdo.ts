@@ -165,6 +165,7 @@ export function gdoRoutes(app: Hono) {
 
     return apiXml(c, {
       root: {
+        status: "success",
         publishers: {
           publisher: {
             "@_id": 12,
