@@ -10,7 +10,7 @@
     <a href="https://github.com/DestinationHome/game-heavywater/actions/workflows/lint.yml"><img src="https://img.shields.io/github/actions/workflow/status/DestinationHome/game-heavywater/lint.yml?branch=main&style=flat-square&label=lint%20%26%20tests" alt="Lint & Tests Status"></a>
     <a href="https://github.com/DestinationHome/game-heavywater/actions/workflows/docker.yml"><img src="https://img.shields.io/github/actions/workflow/status/DestinationHome/game-heavywater/docker.yml?branch=main&style=flat-square&label=build" alt="Build Status"></a>
     <a href="https://github.com/DestinationHome/game-heavywater/pkgs/container/game-heavywater"><img src="https://img.shields.io/badge/docker-ghcr.io-blue?style=flat-square&logo=docker" alt="Docker Image"></a>
-    <a href="#license"><img src="https://img.shields.io/badge/license-GPLv3-blue?style=flat-square" alt="License"></a>
+    <a href="#license"><img src="https://img.shields.io/badge/license-AGPLv3-blue?style=flat-square" alt="License"></a>
   </p>
 
 </div>
@@ -29,7 +29,6 @@
   - Vehicle upgrades, decals, and store progress
   - Session metrics & score tracking
   - Controller camera & sensitivity configurations
-- [ ] **Heavy Water Avalon Sub / Casino & Spaces** *(Upcoming)*
 
 ## 🌠 Features
 
