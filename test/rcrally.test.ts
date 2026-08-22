@@ -4,6 +4,17 @@ import app from "../src/index";
 describe("RC Rally & GDO Endpoints", () => {
   const testUser = `racer_${Math.random().toString(36).slice(2, 8)}`;
 
+  it("GET / with query params returns success XML", async () => {
+    const res = await app.fetch(
+      new Request(
+        `http://localhost/?user=${testUser}&venue=rc_track_1&award=first_place`,
+      ),
+    );
+    expect(res.status).toBe(200);
+    const text = await res.text();
+    expect(text).toContain("<status>success</status>");
+  });
+
   it("GET /publisher/list returns valid XML with publisher ID 12", async () => {
     const res = await app.fetch(
       new Request("http://localhost/publisher/list"),

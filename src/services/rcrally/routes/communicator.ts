@@ -6,6 +6,22 @@ import { handleTimes, handleParts, handleObjectives } from "../handlers";
 import type { RcRallyUserData } from "../types";
 
 export function communicatorRoutes(app: Hono) {
+  // GET pings / queries from Heavy Water games (e.g. ?user=...&venue=...&award=...)
+  const handleCommunicatorGet = (c: Context) => {
+    const user = c.req.query("user");
+    const venue = c.req.query("venue");
+    const award = c.req.query("award");
+    log.info(`[HEAVYWATER GET] path=${c.req.path} user=${user ?? "-"} venue=${venue ?? "-"} award=${award ?? "-"}`);
+    return apiXml(c, {
+      root: {
+        status: "success",
+      },
+    });
+  };
+
+  app.get("/", handleCommunicatorGet);
+  app.get("/heavywater/*", handleCommunicatorGet);
+
   // Catch-all POST for Heavy Water ServerCommunicator XML saves
   app.post("/heavywater/*", async (c: Context) => {
     return handleCommunicatorPost(c);
@@ -17,7 +33,11 @@ export function communicatorRoutes(app: Hono) {
     if (service) {
       return handleCommunicatorPost(c);
     }
-    return c.text("OK", 200);
+    return apiXml(c, {
+      root: {
+        status: "success",
+      },
+    });
   });
 }
 
