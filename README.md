@@ -7,6 +7,7 @@
   </p>
 
   <p>
+    <a href="https://github.com/DestinationHome/game-emoray/actions/workflows/lint.yml"><img src="https://img.shields.io/github/actions/workflow/status/DestinationHome/game-emoray/lint.yml?branch=main&style=flat-square&label=lint%20%26%20tests" alt="Lint & Tests Status"></a>
     <a href="https://github.com/DestinationHome/game-emoray/actions/workflows/docker.yml"><img src="https://img.shields.io/github/actions/workflow/status/DestinationHome/game-emoray/docker.yml?branch=main&style=flat-square&label=build" alt="Build Status"></a>
     <a href="https://github.com/DestinationHome/game-emoray/pkgs/container/game-emoray"><img src="https://img.shields.io/badge/docker-ghcr.io-blue?style=flat-square&logo=docker" alt="Docker Image"></a>
     <a href="#license"><img src="https://img.shields.io/badge/license-GPLv3-blue?style=flat-square" alt="License"></a>
