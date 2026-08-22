@@ -24,14 +24,13 @@
 
 - 🎮 **Complete EmoRay Support**: Handles story & mission progression, equipped mod loadouts, vehicle slots, weapon upgrades, scores, controller bindings, and garage store states.
 - 💾 **SQLite Persistence**: Powered by [Drizzle ORM](https://orm.drizzle.team) and Bun SQLite with built-in default initialization seeded from the original client scripts.
-- 📊 **Telemetry Ingestion**: Collects runtime game and garage telemetry events.
 - 🪵 **Modern Observability**: LogLayer, Pino pretty logging, and OpenTelemetry OTLP tracing / log exporting.
 
 ---
 
 ## 🌐 Required Domains
 
-Route the following domains through your DNS / reverse proxy to this container (default port `30082`):
+Route the following domains through your DNS / reverse proxy to this container (default port `30086`):
 
 | Domain | Protocol | Purpose |
 | :--- | :--- | :--- |
@@ -40,7 +39,7 @@ Route the following domains through your DNS / reverse proxy to this container (
 | `www.services.heavyh2o.net` | HTTP | Client fallback / standard base URL |
 
 > [!TIP]
-> Use [**mallory-rs**](https://github.com/ZephyrCodesStuff/mallory-rs) to easily debug and proxy HTTPS/TLS requests from the PS3 client.
+> Use [**mallory-rs**](https://github.com/ZephyrCodesStuff/mallory-rs) to easily debug and proxy HTTPS/TLS requests from the client.
 
 ---
 
@@ -73,4 +72,4 @@ Run with Docker Compose:
 docker compose up -d
 ```
 
-The service will start listening on port `30082`.
+The service will start listening on port `30086`.

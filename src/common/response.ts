@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import type { StatusCode } from "hono/utils/http-status";
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   STATUS: "SUCCESS" | "ERROR";
   result?: T;
   message?: string;

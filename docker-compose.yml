@@ -10,4 +10,4 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://172.17.0.1:4318
       - PORT=3000
     ports:
-      - "30082:3000"
+      - "30086:3000"

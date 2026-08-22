@@ -17,9 +17,13 @@ import {
   ATTR_SERVICE_VERSION,
 } from "@opentelemetry/semantic-conventions";
 
+declare global {
+  var __otel_initialized__: boolean | undefined;
+}
+
 // Avoid duplicate SDK initialization when Bun hot-reloads the application
-if (!(globalThis as any).__otel_initialized__) {
-  (globalThis as any).__otel_initialized__ = true;
+if (!globalThis.__otel_initialized__) {
+  globalThis.__otel_initialized__ = true;
 
   // Enable OpenTelemetry diagnostic logging
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);

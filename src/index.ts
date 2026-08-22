@@ -4,7 +4,6 @@ import { openTelemetryPlugin } from "@loglayer/plugin-opentelemetry";
 import { OpenTelemetryTransport } from "@loglayer/transport-opentelemetry";
 import { PinoTransport } from "@loglayer/transport-pino";
 import { Hono } from "hono";
-import { trimTrailingSlash } from "hono/trailing-slash";
 import { LogLayer } from "loglayer";
 import pino from "pino";
 import { serializeError } from "serialize-error";
@@ -38,7 +37,7 @@ export const log = new LogLayer({
     }),
     new OpenTelemetryTransport(),
   ],
-  // @ts-ignore The types are correct
+  // @ts-expect-error The types are correct
   plugins: [openTelemetryPlugin()],
 });
 

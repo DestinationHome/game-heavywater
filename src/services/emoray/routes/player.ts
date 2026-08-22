@@ -1,4 +1,4 @@
-import type { Hono } from "hono";
+import type { Context, Hono } from "hono";
 import { eq } from "drizzle-orm";
 import { log } from "@main";
 import { db, emorayPlayers } from "../../../db";
@@ -11,10 +11,19 @@ import {
   defaultScoresData,
 } from "../../../defaults/progressDefaults";
 
+export interface PlayerDataStore {
+  uuid: string;
+  ProgressionData: typeof defaultProgressionData;
+  EquippedData: typeof defaultEquippedData;
+  StoreProgressData: typeof defaultStoreProgressData;
+  ControllerData: typeof defaultControllerData;
+  ScoresData: typeof defaultScoresData;
+}
+
 /**
  * Ensures player profile exists in database, populating defaults if missing.
  */
-async function getOrCreatePlayer(uuid: string) {
+async function getOrCreatePlayer(uuid: string): Promise<PlayerDataStore> {
   const existing = await db
     .select()
     .from(emorayPlayers)
@@ -64,7 +73,9 @@ async function getOrCreatePlayer(uuid: string) {
   };
 }
 
-const columnMap: Record<string, keyof typeof emorayPlayers.$inferSelect> = {
+type DataTypeKey = keyof Omit<PlayerDataStore, "uuid">;
+
+const columnMap: Record<DataTypeKey, keyof typeof emorayPlayers.$inferSelect> = {
   ProgressionData: "progressionData",
   EquippedData: "equippedData",
   StoreProgressData: "storeProgressData",
@@ -73,12 +84,12 @@ const columnMap: Record<string, keyof typeof emorayPlayers.$inferSelect> = {
 };
 
 export function playerRoutes(app: Hono) {
-  const handleGetData = async (c: any) => {
+  const handleGetData = async (c: Context) => {
     const uuid = c.req.param("uuid");
-    const dataType = c.req.param("dataType");
+    const dataType = c.req.param("dataType") as DataTypeKey;
 
     try {
-      const player: any = await getOrCreatePlayer(uuid);
+      const player = await getOrCreatePlayer(uuid);
       const data = player[dataType];
 
       if (!data) {
@@ -93,9 +104,9 @@ export function playerRoutes(app: Hono) {
     }
   };
 
-  const handlePutData = async (c: any) => {
+  const handlePutData = async (c: Context) => {
     const uuid = c.req.param("uuid");
-    const dataType = c.req.param("dataType");
+    const dataType = c.req.param("dataType") as DataTypeKey;
     const colName = columnMap[dataType];
 
     if (!colName) {
@@ -121,10 +132,10 @@ export function playerRoutes(app: Hono) {
         payload = { StoreProgress: body };
       }
 
-      const updateData: any = {
+      const updateData: Partial<typeof emorayPlayers.$inferInsert> = {
         updatedAt: Date.now(),
+        [colName]: JSON.stringify(payload),
       };
-      updateData[colName] = JSON.stringify(payload);
 
       await db
         .update(emorayPlayers)
