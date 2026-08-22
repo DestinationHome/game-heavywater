@@ -16,6 +16,37 @@ function bestTimeMs(u: RcRallyUserData | undefined, track: string): number {
   return -1;
 }
 
+export const RCR_ALL_QUESTS = [
+  "RedCupsOnly_T1",
+  "BlueCupsOnly_T1",
+  "YellowCupsOnly_T1",
+  "GetAllCups_T1",
+  "BeatPreviousTime_T1",
+  "RedCupsOnly_T2",
+  "BlueCupsOnly_T2",
+  "YellowCupsOnly_T2",
+  "GetAllCups_T2",
+  "BeatPreviousTime_T2",
+  "RedCupsOnly_T3",
+  "BlueCupsOnly_T3",
+  "YellowCupsOnly_T3",
+  "GetAllCups_T3",
+  "BeatPreviousTime_T3",
+  "CompleteFirstRace",
+  "ModFirstVehicle",
+  "CompleteMultiplayerRace",
+  "WinMultiplayerRace",
+  "UnlockTrack2",
+  "UnlockTrack3",
+  "LapTime_T1",
+  "LapTime_T2",
+  "LapTime_T3",
+  "NoCups_T1",
+  "NoCups_T2",
+  "NoCups_T3",
+  "CompleteAllAdvancedObjectives",
+];
+
 export function gdoRoutes(app: Hono) {
   // 1. Publisher List
   const handlePublisherList = (c: Context) => {
@@ -113,14 +144,12 @@ export function gdoRoutes(app: Hono) {
     const u = await getUserData(user);
     const objKeys = Object.keys(u.objectives || {});
 
-    const questsNode = objKeys.length > 0
-      ? {
-          quest: objKeys.map((id) => ({
-            "@_id": id,
-            name: id,
-          })),
-        }
-      : "";
+    const questsNode = {
+      quest: RCR_ALL_QUESTS.map((id) => ({
+        "@_id": id,
+        name: id,
+      })),
+    };
 
     const publisherQuestsNode = objKeys.length > 0
       ? {
