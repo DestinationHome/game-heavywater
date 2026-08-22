@@ -9,15 +9,3 @@ export function num(v: unknown): number {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
 }
-
-/** Escape a value for safe inclusion in XML text/attributes. */
-export function xmlEsc(s: unknown): string {
-  const map: Record<string, string> = {
-    "<": "&lt;",
-    ">": "&gt;",
-    "&": "&amp;",
-    "'": "&apos;",
-    '"': "&quot;",
-  };
-  return String(s ?? "").replace(/[<>&'"]/g, (c) => map[c]);
-}

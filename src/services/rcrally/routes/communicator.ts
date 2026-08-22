@@ -1,11 +1,9 @@
 import type { Context, Hono } from "hono";
-import { XMLParser } from "fast-xml-parser";
 import { log } from "@main";
+import { apiXml, parseXml } from "../../../common/xml";
 import { getUserData, saveUserData } from "../store";
 import { handleTimes, handleParts, handleObjectives } from "../handlers";
 import type { RcRallyUserData } from "../types";
-
-const parser = new XMLParser({ ignoreAttributes: false });
 
 export function communicatorRoutes(app: Hono) {
   // Catch-all POST for Heavy Water ServerCommunicator XML saves
@@ -32,7 +30,7 @@ async function handleCommunicatorPost(c: Context) {
 
   if (raw) {
     try {
-      parsed = parser.parse(raw);
+      parsed = parseXml(raw);
     } catch (err) {
       log.withError(err).warn("Failed to parse Heavy Water Communicator XML body");
     }
@@ -71,7 +69,9 @@ async function handleCommunicatorPost(c: Context) {
     }
   }
 
-  return c.text("<root><status>success</status></root>", 200, {
-    "Content-Type": "text/xml",
+  return apiXml(c, {
+    root: {
+      status: "success",
+    },
   });
 }
