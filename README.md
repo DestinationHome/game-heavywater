@@ -1,46 +1,76 @@
-# Emo Ray Minigame Backend API (`psh-emoray`)
+<div align="center">
 
-Backend API service for the PlayStation Home minigame **Emo Ray vs. Intergalactic Teddy Bears** (Heavy Water / D2O).
+  <h1>🧸 <code>psh-emoray</code> 🚗</h1>
 
-## Features
+  <p>
+    <strong>Backend API service for the PlayStation Home minigame <em>Emo Ray vs. Intergalactic Teddy Bears</em> (Heavy Water / D2O).</strong>
+  </p>
 
-- **NP Ticket Validation**: Stubbed ticket validation returning player IDs and environment settings (`/D2O/Ticket/validate/*`).
-- **Telemetry & Metrics**: Collects game metrics and telemetry data (`/D2O/EmoRay/metrics`).
-- **Player Progression & Save States**: Persistent storage with SQLite & Drizzle ORM for:
-  - Progression data (story/mission chapters, episode unlocks)
-  - Equipped mods & weapons (MiniGun, Cannon, Decal, Engine, etc.)
-  - Store progress & ModPoints (upgrades, unlocked furniture, costumes, posters)
-  - Scores per episode and chapter
-  - Controller configurations (camera inversion, sensitivity)
-- **Logging & Observability**: Integrated with LogLayer, Pino, and OpenTelemetry OTLP tracing & logging.
-- **Docker & CI/CD**: Containerized with multi-stage Bun Alpine Dockerfile and automated GitHub Container Registry (GHCR) publishing.
+  <p>
+    <a href="https://github.com/DestinationHome/game-emoray/actions/workflows/docker.yml"><img src="https://img.shields.io/github/actions/workflow/status/DestinationHome/game-emoray/docker.yml?branch=main&style=flat-square&label=build" alt="Build Status"></a>
+    <a href="https://github.com/DestinationHome/game-emoray/pkgs/container/game-emoray"><img src="https://img.shields.io/badge/docker-ghcr.io-blue?style=flat-square&logo=docker" alt="Docker Image"></a>
+    <a href="#license"><img src="https://img.shields.io/badge/license-GPLv3-blue?style=flat-square" alt="License"></a>
+  </p>
 
-## Tech Stack
+</div>
 
-- **Runtime**: [Bun](https://bun.sh)
-- **Framework**: [Hono](https://hono.dev)
-- **ORM / Database**: [Drizzle ORM](https://orm.drizzle.team) + [SQLite (Bun SQLite)](https://bun.sh/docs/api/sqlite)
-- **Logging**: [LogLayer](https://loglayer.dev) + [Pino](https://getpino.io) + [OpenTelemetry](https://opentelemetry.io)
+---
 
-## Getting Started
+## 🌟 Authors
 
-### Local Development
+- [@zeph](https://github.com/ZephyrCodesStuff)
 
-1. Install dependencies:
+## 🌠 Features
+
+- 🎮 **Complete EmoRay Support**: Handles story & mission progression, equipped mod loadouts, vehicle slots, weapon upgrades, scores, controller bindings, and garage store states.
+- 💾 **SQLite Persistence**: Powered by [Drizzle ORM](https://orm.drizzle.team) and Bun SQLite with built-in default initialization seeded from the original client scripts.
+- 📊 **Telemetry Ingestion**: Collects runtime game and garage telemetry events.
+- 🪵 **Modern Observability**: LogLayer, Pino pretty logging, and OpenTelemetry OTLP tracing / log exporting.
+
+---
+
+## 🌐 Required Domains
+
+Route the following domains through your DNS / reverse proxy to this container (default port `30082`):
+
+| Domain | Protocol | Purpose |
+| :--- | :--- | :--- |
+| `services.heavyh2o.net` | HTTP | Progression, Equipped, Scores, Config, StoreProgress, and Metrics |
+| `secure.heavyh2o.net` | HTTPS | PlayStation Network Ticket Validation (`/D2O/Ticket/validate/*`) |
+| `www.services.heavyh2o.net` | HTTP | Client fallback / standard base URL |
+
+> [!TIP]
+> Use [**mallory-rs**](https://github.com/ZephyrCodesStuff/mallory-rs) to easily debug and proxy HTTPS/TLS requests from the PS3 client.
+
+---
+
+## 🧰 Getting Started
+
+### Quick Local Run
+
+1. **Install dependencies:**
    ```bash
    bun install
    ```
 
-2. Start the development server:
+2. **Start the development server:**
    ```bash
    bun run dev
    ```
 
-The server will start on port `3000` (or `PORT` env var).
+3. **Run unit tests:**
+   ```bash
+   bun test
+   ```
+
+---
 
 ### Docker Deployment
 
 Run with Docker Compose:
+
 ```bash
 docker compose up -d
 ```
+
+The service will start listening on port `30082`.
