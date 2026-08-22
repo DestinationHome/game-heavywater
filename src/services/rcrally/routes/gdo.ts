@@ -129,21 +129,46 @@ export function gdoRoutes(app: Hono) {
     const objKeys = Object.keys(u.objectives || {});
 
     const questsNode = {
-      quest: RCR_ALL_QUESTS.map((id) => ({
-        "@_id": id,
-        name: id,
+      quest: RCR_ALL_QUESTS.map((name, index) => ({
+        "@_id": index + 1,
+        name,
+        description: name,
+        failure: "Failed",
+        initial: 1,
+        start: "2020.01.01 00:00:00",
+        end: "2030.01.01 00:00:00",
+        track: true,
+        loyalty: false,
+        start_conditions: {
+          client: "",
+          server: "",
+        },
       })),
     };
 
-    const publisherQuestsNode = objKeys.length > 0
-      ? {
-          quest: objKeys.map((id) => ({
-            "@_id": id,
-            status: "completed",
-            completed_timestamp: "2026.01.01 00:00:00",
-          })),
-        }
-      : "";
+    const completedQuests = objKeys.map((name, i) => {
+      const idx = RCR_ALL_QUESTS.indexOf(name);
+      return {
+        "@_id": idx !== -1 ? idx + 1 : i + 1,
+        status: "completed",
+        shared: false,
+        group: 1,
+        tasks: "",
+      };
+    });
+
+    const publisherQuestsNode = {
+      publisher_quest: {
+        np_online_id: user,
+        publisher_id: 12,
+        tasks_completed: 0,
+        quests_started: 0,
+        quests_completed: completedQuests.length,
+        quests_failed: 0,
+        quests_quit: 0,
+        quests: completedQuests.length > 0 ? { quest: completedQuests } : "",
+      },
+    };
 
     log.info(`[GDO] user/space path=${c.req.path} space=${space} user=${user} quests=${objKeys.length}`);
 
