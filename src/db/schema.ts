@@ -18,3 +18,12 @@ export const emorayMetrics = sqliteTable("emoray_metrics", {
   data: text("data").notNull(), // JSON
   createdAt: integer("created_at").notNull(),
 });
+
+export const rcrallyUsers = sqliteTable("rcrally_users", {
+  username: text("username").primaryKey(),
+  times: text("times"), // JSON: Record<string, { time: number; splits: number[] }>
+  parts: text("parts"), // JSON: Record<string, number>
+  objectives: text("objectives"), // JSON: Record<string, number>
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+});

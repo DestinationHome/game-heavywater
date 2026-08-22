@@ -9,6 +9,7 @@ import pino from "pino";
 import { serializeError } from "serialize-error";
 
 import { EmoRayService } from "./services/emoray/service";
+import { RcRallyService } from "./services/rcrally/service";
 
 const app = new Hono();
 
@@ -22,7 +23,7 @@ app.use(async (c, next) => {
   await next();
 });
 
-const services = [new EmoRayService()];
+const services = [new EmoRayService(), new RcRallyService()];
 
 // middleware and logging
 export const log = new LogLayer({

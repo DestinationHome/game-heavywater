@@ -19,6 +19,7 @@
     "@opentelemetry/sdk-node": "^0.220.0",
     "@opentelemetry/semantic-conventions": "^1.43.0",
     "drizzle-orm": "^0.45.2",
+    "fast-xml-parser": "^5.11.0",
     "hono": "^4.12.27",
     "loglayer": "^9.3.0",
     "pino": "^10.3.1",

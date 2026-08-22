@@ -33,5 +33,16 @@ sqlite.run(`
   );
 `);
 
+sqlite.run(`
+  CREATE TABLE IF NOT EXISTS rcrally_users (
+    username TEXT PRIMARY KEY,
+    times TEXT,
+    parts TEXT,
+    objectives TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  );
+`);
+
 export const db = drizzle(sqlite, { schema });
 export * from "./schema";

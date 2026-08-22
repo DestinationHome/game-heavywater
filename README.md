@@ -29,6 +29,13 @@
   - Vehicle upgrades, decals, and store progress
   - Session metrics & score tracking
   - Controller camera & sensitivity configurations
+- [x] **RC Rally** (SCEA Destinations GDO & Communicator)
+  - Publisher listing and token verification
+  - Track lap times & split times
+  - Car parts loadouts & quest objectives
+  - Global leaderboard rankings
+  - User synchronization
+- [ ] **Heavy Water Avalon Sub / Casino & Spaces** *(Upcoming)*
 
 ## 🌠 Features
 
@@ -44,8 +51,9 @@ Route the following domains through your DNS / reverse proxy to this container (
 
 | Domain | Protocol | Purpose |
 | :--- | :--- | :--- |
-| `services.heavyh2o.net` | HTTP | Progression, Equipped, Scores, Config, StoreProgress, and Metrics |
+| `services.heavyh2o.net` | HTTP | EmoRay progression, equipped, scores, and RC Rally Communicator XML |
 | `secure.heavyh2o.net` | HTTPS | PlayStation Network Ticket Validation (`/D2O/Ticket/validate/*`) |
+| `destinations.destinationhome.live` | HTTP | RC Rally Destinations GDO endpoints (`/publisher/list`, `/user/game/*`, `/leaderboard/*`) |
 | `www.services.heavyh2o.net` | HTTP | Client fallback / standard base URL |
 
 > [!TIP]
