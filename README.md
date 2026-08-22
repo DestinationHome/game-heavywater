@@ -47,7 +47,7 @@
 
 ## 🌐 Required Domains
 
-Route the following domains through your DNS / reverse proxy to this container (default port `30082`):
+Route the following domains through your DNS / reverse proxy to this container (default port `30086`):
 
 | Domain | Protocol | Purpose |
 | :--- | :--- | :--- |
@@ -91,4 +91,4 @@ Run with Docker Compose:
 docker compose up -d
 ```
 
-The service will start listening on port `30082`.
+The service will start listening on port `30086`.
