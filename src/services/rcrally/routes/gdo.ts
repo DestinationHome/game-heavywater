@@ -64,13 +64,14 @@ export function gdoRoutes(app: Hono) {
       },
     });
   };
-  app.get("/publisher/list", handlePublisherList);
-  app.get("/publisher/list/", handlePublisherList);
+  app.get("/publisher/*", handlePublisherList);
 
   // 2. Per-user Game Data
   const handleUserGame = async (c: Context) => {
-    const game = c.req.param("game");
-    const user = c.req.param("user");
+    const rawPath = c.req.path.replace(/^\/user\/game\/?/, "");
+    const parts = rawPath.split("/").filter(Boolean);
+    const game = parts[1] || "7";
+    const user = parts[3] || parts[parts.length - 1] || "user";
 
     const u = await getUserData(user);
     const t1 = bestTimeMs(u, "1");
@@ -132,14 +133,15 @@ export function gdoRoutes(app: Hono) {
       },
     });
   };
-  app.get("/user/game/:pub/:game/:locale/:user", handleUserGame);
-  app.get("/user/game/:pub/:game/:locale/:user/", handleUserGame);
+  app.get("/user/game/*", handleUserGame);
 
   // 3. User Space / Quests
   const handleUserSpace = async (c: Context) => {
-    const space = c.req.param("space");
-    const locale = c.req.param("locale");
-    const user = c.req.param("user");
+    const rawPath = c.req.path.replace(/^\/user\/space\/?/, "");
+    const parts = rawPath.split("/").filter(Boolean);
+    const space = parts[0] || "heavywater_rcrally_game";
+    const locale = parts[1] || "en_US";
+    const user = parts[2] || parts[parts.length - 1] || "user";
 
     const u = await getUserData(user);
     const objKeys = Object.keys(u.objectives || {});
@@ -161,7 +163,7 @@ export function gdoRoutes(app: Hono) {
         }
       : "";
 
-    log.info(`[GDO] user/space space=${space} user=${user} quests=${objKeys.length}`);
+    log.info(`[GDO] user/space path=${c.req.path} space=${space} user=${user} quests=${objKeys.length}`);
 
     return apiXml(c, {
       root: {
@@ -192,12 +194,13 @@ export function gdoRoutes(app: Hono) {
       },
     });
   };
-  app.get("/user/space/:space/:locale/:user/:age", handleUserSpace);
-  app.get("/user/space/:space/:locale/:user/:age/", handleUserSpace);
+  app.get("/user/space/*", handleUserSpace);
 
   // 4. Leaderboard
   const handleLeaderboard = async (c: Context) => {
-    const period = c.req.param("period");
+    const rawPath = c.req.path.replace(/^\/leaderboard\/?/, "");
+    const parts = rawPath.split("/").filter(Boolean);
+    const period = parts[2] || "allTime";
     const allUsers = await getAllUsers();
 
     const rows: { player: string; value: number }[] = [];
@@ -235,12 +238,13 @@ export function gdoRoutes(app: Hono) {
       },
     });
   };
-  app.get("/leaderboard/:game/:territory/:period", handleLeaderboard);
-  app.get("/leaderboard/:game/:territory/:period/", handleLeaderboard);
+  app.get("/leaderboard/*", handleLeaderboard);
 
   // 5. User Sync
   const handleUserSync = (c: Context) => {
-    const user = c.req.param("user");
+    const rawPath = c.req.path.replace(/^\/user\/sync\/?/, "");
+    const parts = rawPath.split("/").filter(Boolean);
+    const user = parts[1] || parts[0] || "user";
     log.info(`[GDO] user/sync user=${user}`);
     return apiXml(c, {
       root: {
@@ -248,6 +252,5 @@ export function gdoRoutes(app: Hono) {
       },
     });
   };
-  app.post("/user/sync/:territory/:user", handleUserSync);
-  app.post("/user/sync/:territory/:user/", handleUserSync);
+  app.post("/user/sync/*", handleUserSync);
 }
