@@ -4,6 +4,7 @@ import { openTelemetryPlugin } from "@loglayer/plugin-opentelemetry";
 import { OpenTelemetryTransport } from "@loglayer/transport-opentelemetry";
 import { PinoTransport } from "@loglayer/transport-pino";
 import { Hono } from "hono";
+import { trimTrailingSlash } from "hono/trailing-slash";
 import { LogLayer } from "loglayer";
 import pino from "pino";
 import { serializeError } from "serialize-error";
@@ -11,6 +12,17 @@ import { serializeError } from "serialize-error";
 import { EmoRayService } from "./services/emoray/service";
 
 const app = new Hono();
+
+// Strip trailing slashes silently without HTTP redirect
+app.use(async (c, next) => {
+  const url = new URL(c.req.url);
+  if (url.pathname.endsWith("/") && url.pathname.length > 1) {
+    url.pathname = url.pathname.replace(/\/+$/, "");
+    c.req.raw = new Request(url.toString(), c.req.raw);
+  }
+  await next();
+});
+
 const services = [new EmoRayService()];
 
 // middleware and logging

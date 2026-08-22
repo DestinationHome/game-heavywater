@@ -24,19 +24,19 @@ async function getOrCreatePlayer(uuid: string) {
   if (existing) {
     return {
       uuid: existing.uuid,
-      progressionData: existing.progressionData
+      ProgressionData: existing.progressionData
         ? JSON.parse(existing.progressionData)
         : defaultProgressionData,
-      equippedData: existing.equippedData
+      EquippedData: existing.equippedData
         ? JSON.parse(existing.equippedData)
         : defaultEquippedData,
-      storeProgressData: existing.storeProgressData
+      StoreProgressData: existing.storeProgressData
         ? JSON.parse(existing.storeProgressData)
         : defaultStoreProgressData,
-      controllerData: existing.controllerData
+      ControllerData: existing.controllerData
         ? JSON.parse(existing.controllerData)
         : defaultControllerData,
-      scoresData: existing.scoresData
+      ScoresData: existing.scoresData
         ? JSON.parse(existing.scoresData)
         : defaultScoresData,
     };
@@ -56,187 +56,92 @@ async function getOrCreatePlayer(uuid: string) {
 
   return {
     uuid,
-    progressionData: defaultProgressionData,
-    equippedData: defaultEquippedData,
-    storeProgressData: defaultStoreProgressData,
-    controllerData: defaultControllerData,
-    scoresData: defaultScoresData,
+    ProgressionData: defaultProgressionData,
+    EquippedData: defaultEquippedData,
+    StoreProgressData: defaultStoreProgressData,
+    ControllerData: defaultControllerData,
+    ScoresData: defaultScoresData,
   };
 }
 
+const columnMap: Record<string, keyof typeof emorayPlayers.$inferSelect> = {
+  ProgressionData: "progressionData",
+  EquippedData: "equippedData",
+  StoreProgressData: "storeProgressData",
+  ControllerData: "controllerData",
+  ScoresData: "scoresData",
+};
+
 export function playerRoutes(app: Hono) {
-  // 1. ProgressionData (GET / PUT)
-  app.get("/D2O/EmoRay/player/:uuid/data/ProgressionData", async (c) => {
+  const handleGetData = async (c: any) => {
     const uuid = c.req.param("uuid");
+    const dataType = c.req.param("dataType");
+
     try {
-      const player = await getOrCreatePlayer(uuid);
-      return apiSuccess(c, player.progressionData);
+      const player: any = await getOrCreatePlayer(uuid);
+      const data = player[dataType];
+
+      if (!data) {
+        log.warn(`Unknown dataType requested: ${dataType} for ${uuid}`);
+        return apiError(c, "Unknown data type", 404);
+      }
+
+      return apiSuccess(c, data);
     } catch (err) {
-      log.withError(err).error(`Failed to get ProgressionData for ${uuid}`);
-      return apiError(c, "Failed to load progression data", 500);
+      log.withError(err).error(`Failed to get ${dataType} for ${uuid}`);
+      return apiError(c, "Failed to load player data", 500);
     }
-  });
+  };
 
-  app.put("/D2O/EmoRay/player/:uuid/data/ProgressionData", async (c) => {
+  const handlePutData = async (c: any) => {
     const uuid = c.req.param("uuid");
-    try {
-      const body = await c.req.json();
-      await getOrCreatePlayer(uuid);
+    const dataType = c.req.param("dataType");
+    const colName = columnMap[dataType];
 
-      const payload = body.ProgressData !== undefined ? body : { ProgressData: body };
-      await db
-        .update(emorayPlayers)
-        .set({
-          progressionData: JSON.stringify(payload),
-          updatedAt: Date.now(),
-        })
-        .where(eq(emorayPlayers.uuid, uuid));
-
-      log.info(`Updated ProgressionData for player ${uuid}`);
-      return apiSuccess(c, payload);
-    } catch (err) {
-      log.withError(err).error(`Failed to save ProgressionData for ${uuid}`);
-      return apiError(c, "Failed to save progression data", 500);
+    if (!colName) {
+      log.warn(`Unknown dataType received in PUT: ${dataType} for ${uuid}`);
+      return apiError(c, "Unknown data type", 400);
     }
-  });
 
-  // 2. EquippedData (GET / PUT)
-  app.get("/D2O/EmoRay/player/:uuid/data/EquippedData", async (c) => {
-    const uuid = c.req.param("uuid");
-    try {
-      const player = await getOrCreatePlayer(uuid);
-      return apiSuccess(c, player.equippedData);
-    } catch (err) {
-      log.withError(err).error(`Failed to get EquippedData for ${uuid}`);
-      return apiError(c, "Failed to load equipped data", 500);
-    }
-  });
-
-  app.put("/D2O/EmoRay/player/:uuid/data/EquippedData", async (c) => {
-    const uuid = c.req.param("uuid");
     try {
       const body = await c.req.json();
       await getOrCreatePlayer(uuid);
 
-      const payload = body.Equipped !== undefined ? body : { Equipped: body };
+      // Normalize body if needed
+      let payload = body;
+      if (dataType === "ProgressionData" && body.ProgressData === undefined) {
+        payload = { ProgressData: body };
+      } else if (dataType === "EquippedData" && body.Equipped === undefined) {
+        payload = { Equipped: body };
+      } else if (dataType === "ScoresData" && body.Scores === undefined) {
+        payload = { Scores: body };
+      } else if (dataType === "ControllerData" && body.Config === undefined) {
+        payload = { Config: body };
+      } else if (dataType === "StoreProgressData" && body.StoreProgress === undefined) {
+        payload = { StoreProgress: body };
+      }
+
+      const updateData: any = {
+        updatedAt: Date.now(),
+      };
+      updateData[colName] = JSON.stringify(payload);
+
       await db
         .update(emorayPlayers)
-        .set({
-          equippedData: JSON.stringify(payload),
-          updatedAt: Date.now(),
-        })
+        .set(updateData)
         .where(eq(emorayPlayers.uuid, uuid));
 
-      log.info(`Updated EquippedData for player ${uuid}`);
+      log.info(`Updated ${dataType} for player ${uuid}`);
       return apiSuccess(c, payload);
     } catch (err) {
-      log.withError(err).error(`Failed to save EquippedData for ${uuid}`);
-      return apiError(c, "Failed to save equipped data", 500);
+      log.withError(err).error(`Failed to save ${dataType} for ${uuid}`);
+      return apiError(c, "Failed to save player data", 500);
     }
-  });
+  };
 
-  // 3. ScoresData (GET / PUT)
-  app.get("/D2O/EmoRay/player/:uuid/data/ScoresData", async (c) => {
-    const uuid = c.req.param("uuid");
-    try {
-      const player = await getOrCreatePlayer(uuid);
-      return apiSuccess(c, player.scoresData);
-    } catch (err) {
-      log.withError(err).error(`Failed to get ScoresData for ${uuid}`);
-      return apiError(c, "Failed to load scores data", 500);
-    }
-  });
-
-  app.put("/D2O/EmoRay/player/:uuid/data/ScoresData", async (c) => {
-    const uuid = c.req.param("uuid");
-    try {
-      const body = await c.req.json();
-      await getOrCreatePlayer(uuid);
-
-      const payload = body.Scores !== undefined ? body : { Scores: body };
-      await db
-        .update(emorayPlayers)
-        .set({
-          scoresData: JSON.stringify(payload),
-          updatedAt: Date.now(),
-        })
-        .where(eq(emorayPlayers.uuid, uuid));
-
-      log.info(`Updated ScoresData for player ${uuid}`);
-      return apiSuccess(c, payload);
-    } catch (err) {
-      log.withError(err).error(`Failed to save ScoresData for ${uuid}`);
-      return apiError(c, "Failed to save scores data", 500);
-    }
-  });
-
-  // 4. ControllerData (GET / PUT)
-  app.get("/D2O/EmoRay/player/:uuid/data/ControllerData", async (c) => {
-    const uuid = c.req.param("uuid");
-    try {
-      const player = await getOrCreatePlayer(uuid);
-      return apiSuccess(c, player.controllerData);
-    } catch (err) {
-      log.withError(err).error(`Failed to get ControllerData for ${uuid}`);
-      return apiError(c, "Failed to load controller data", 500);
-    }
-  });
-
-  app.put("/D2O/EmoRay/player/:uuid/data/ControllerData", async (c) => {
-    const uuid = c.req.param("uuid");
-    try {
-      const body = await c.req.json();
-      await getOrCreatePlayer(uuid);
-
-      const payload = body.Config !== undefined ? body : { Config: body };
-      await db
-        .update(emorayPlayers)
-        .set({
-          controllerData: JSON.stringify(payload),
-          updatedAt: Date.now(),
-        })
-        .where(eq(emorayPlayers.uuid, uuid));
-
-      log.info(`Updated ControllerData for player ${uuid}`);
-      return apiSuccess(c, payload);
-    } catch (err) {
-      log.withError(err).error(`Failed to save ControllerData for ${uuid}`);
-      return apiError(c, "Failed to save controller data", 500);
-    }
-  });
-
-  // 5. StoreProgressData (GET / PUT)
-  app.get("/D2O/EmoRay/player/:uuid/data/StoreProgressData", async (c) => {
-    const uuid = c.req.param("uuid");
-    try {
-      const player = await getOrCreatePlayer(uuid);
-      return apiSuccess(c, player.storeProgressData);
-    } catch (err) {
-      log.withError(err).error(`Failed to get StoreProgressData for ${uuid}`);
-      return apiError(c, "Failed to load store progress data", 500);
-    }
-  });
-
-  app.put("/D2O/EmoRay/player/:uuid/data/StoreProgressData", async (c) => {
-    const uuid = c.req.param("uuid");
-    try {
-      const body = await c.req.json();
-      await getOrCreatePlayer(uuid);
-
-      const payload = body.StoreProgress !== undefined ? body : { StoreProgress: body };
-      await db
-        .update(emorayPlayers)
-        .set({
-          storeProgressData: JSON.stringify(payload),
-          updatedAt: Date.now(),
-        })
-        .where(eq(emorayPlayers.uuid, uuid));
-
-      log.info(`Updated StoreProgressData for player ${uuid}`);
-      return apiSuccess(c, payload);
-    } catch (err) {
-      log.withError(err).error(`Failed to save StoreProgressData for ${uuid}`);
-      return apiError(c, "Failed to save store progress data", 500);
-    }
-  });
+  // Support both trailing slash and non-trailing slash endpoints
+  app.get("/D2O/EmoRay/player/:uuid/data/:dataType", handleGetData);
+  app.get("/D2O/EmoRay/player/:uuid/data/:dataType/", handleGetData);
+  app.put("/D2O/EmoRay/player/:uuid/data/:dataType", handlePutData);
+  app.put("/D2O/EmoRay/player/:uuid/data/:dataType/", handlePutData);
 }

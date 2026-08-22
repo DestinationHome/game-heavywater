@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeAll } from "bun:test";
+import { describe, it, expect } from "bun:test";
 import app from "../src/index";
 
 describe("EmoRay API Endpoints", () => {
-  const testUuid = "test_player_001";
+  const getUniqueUuid = () => `test_player_${Math.random().toString(36).slice(2, 10)}`;
 
   it("Health check returns ok", async () => {
     const res = await app.fetch(new Request("http://localhost/health"));
@@ -28,6 +28,7 @@ describe("EmoRay API Endpoints", () => {
   });
 
   it("Metrics submission succeeds", async () => {
+    const testUuid = getUniqueUuid();
     const metricsPayload = {
       Ver: "1.0",
       ID: testUuid,
@@ -59,7 +60,8 @@ describe("EmoRay API Endpoints", () => {
     expect(body.STATUS).toBe("SUCCESS");
   });
 
-  it("Get and Set ProgressionData", async () => {
+  it("Get and Set ProgressionData (including trailing slash)", async () => {
+    const testUuid = getUniqueUuid();
     // 1. GET default progression data
     const getRes = await app.fetch(
       new Request(
@@ -72,13 +74,13 @@ describe("EmoRay API Endpoints", () => {
     expect(getBody.result.ProgressData).toBeDefined();
     expect(getBody.result.ProgressData.Prologue.Unlocked).toBe(true);
 
-    // 2. PUT updated progression data
+    // 2. PUT updated progression data (with trailing slash & query param ?prod=1)
     const updated = JSON.parse(JSON.stringify(getBody.result));
     updated.ProgressData.Episode_01.Unlocked = true;
 
     const putRes = await app.fetch(
       new Request(
-        `http://localhost/D2O/EmoRay/player/${testUuid}/data/ProgressionData`,
+        `http://localhost/D2O/EmoRay/player/${testUuid}/data/ProgressionData/?prod=1`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -102,6 +104,7 @@ describe("EmoRay API Endpoints", () => {
   });
 
   it("Get and Set EquippedData", async () => {
+    const testUuid = getUniqueUuid();
     const getRes = await app.fetch(
       new Request(
         `http://localhost/D2O/EmoRay/player/${testUuid}/data/EquippedData`,
@@ -140,6 +143,7 @@ describe("EmoRay API Endpoints", () => {
   });
 
   it("Get and Set ScoresData", async () => {
+    const testUuid = getUniqueUuid();
     const getRes = await app.fetch(
       new Request(
         `http://localhost/D2O/EmoRay/player/${testUuid}/data/ScoresData`,
@@ -153,7 +157,7 @@ describe("EmoRay API Endpoints", () => {
     // Update score
     const putRes = await app.fetch(
       new Request(
-        `http://localhost/D2O/EmoRay/player/${testUuid}/data/ScoresData`,
+        `http://localhost/D2O/EmoRay/player/${testUuid}/data/ScoresData/?prod=1`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -180,6 +184,7 @@ describe("EmoRay API Endpoints", () => {
   });
 
   it("Get and Set ControllerData", async () => {
+    const testUuid = getUniqueUuid();
     const getRes = await app.fetch(
       new Request(
         `http://localhost/D2O/EmoRay/player/${testUuid}/data/ControllerData`,
@@ -217,6 +222,7 @@ describe("EmoRay API Endpoints", () => {
   });
 
   it("Get and Set StoreProgressData", async () => {
+    const testUuid = getUniqueUuid();
     const getRes = await app.fetch(
       new Request(
         `http://localhost/D2O/EmoRay/player/${testUuid}/data/StoreProgressData`,
