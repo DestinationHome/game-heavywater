@@ -29,13 +29,20 @@
   - Vehicle upgrades, decals, and store progress
   - Session metrics & score tracking
   - Controller camera & sensitivity configurations
+  - Global arcade cabinet leaderboards
 - [x] **RC Rally** (SCEA Destinations GDO & Communicator)
   - Publisher listing and token verification
   - Track lap times & split times
-  - Car parts loadouts & quest objectives
+  - Car parts loadouts & quest objectives (BigInt bit compressed)
   - Global leaderboard rankings
   - User synchronization
-- [ ] **Heavy Water Avalon Sub / Casino & Spaces** *(Upcoming)*
+- [x] **Avalon Keep & Avalon Faire** (Heavy Water Apartment & Space)
+  - House Banner selection (Dragon vs. Lion)
+  - Avalon Keep state persistence (`MyAvalonKeepData`)
+  - Universal D2O player profile sync (`D2OData`)
+  - Crystal Hunter minigame community contributions (`/D2O/Avalon/contributions`)
+  - Session telemetry & metrics tracking
+  - D2O ID resolution & NP Ticket verification (`/D2O/Ticket/verify/*`)
 
 ## 🌠 Features
 

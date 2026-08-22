@@ -44,5 +44,35 @@ sqlite.run(`
   );
 `);
 
+sqlite.run(`
+  CREATE TABLE IF NOT EXISTS avalon_players (
+    uuid TEXT PRIMARY KEY,
+    house_data TEXT,
+    my_avalon_keep_data TEXT,
+    d2o_data TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  );
+`);
+
+sqlite.run(`
+  CREATE TABLE IF NOT EXISTS avalon_metrics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uuid TEXT,
+    version TEXT,
+    data TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  );
+`);
+
+sqlite.run(`
+  CREATE TABLE IF NOT EXISTS avalon_contributions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    house TEXT NOT NULL DEFAULT 'DRAGON',
+    amount INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL
+  );
+`);
+
 export const db = drizzle(sqlite, { schema });
 export * from "./schema";
