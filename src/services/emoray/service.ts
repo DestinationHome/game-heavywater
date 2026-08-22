@@ -3,6 +3,7 @@ import type { Service } from "../service";
 import { authRoutes } from "./routes/auth";
 import { metricsRoutes } from "./routes/metrics";
 import { playerRoutes } from "./routes/player";
+import { scoresRoutes } from "./routes/scores";
 
 export class EmoRayService implements Service {
   name = "EmoRay";
@@ -12,5 +13,6 @@ export class EmoRayService implements Service {
     authRoutes(app);
     metricsRoutes(app);
     playerRoutes(app);
+    scoresRoutes(app);
   }
 }

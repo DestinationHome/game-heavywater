@@ -304,4 +304,16 @@ describe("EmoRay API Endpoints", () => {
     expect(putBody.result.StoreProgress.ModPoints.Owned).toBe(500);
     expect(putBody.result.StoreProgress.Weapons.MiniGun.CurrentTier).toBe(1);
   });
+
+  it("GET /D2O/EmoRay/scores/ returns global leaderboard", async () => {
+    const res = await app.fetch(
+      new Request(
+        "http://localhost/D2O/EmoRay/scores/?range=weekly&limit=10&prod=1",
+      ),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.STATUS).toBe("SUCCESS");
+    expect(Array.isArray(body.result.Scores)).toBe(true);
+  });
 });
