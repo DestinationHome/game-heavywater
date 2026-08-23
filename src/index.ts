@@ -53,13 +53,13 @@ app.use(async (c, next) => {
   await next();
   const ms = Date.now() - start;
 
-  const layer = log.withContext({
-    method: c.req.method,
-    path: c.req.path,
-    status: c.res.status,
-  });
-
-  layer.info(`--> ${c.req.method} ${c.req.path} ${c.res.status} ${ms}ms`);
+  log
+    .withMetadata({
+      method: c.req.method,
+      path: c.req.path,
+      status: c.res.status,
+    })
+    .info(`--> ${c.req.method} ${c.req.path} ${c.res.status} ${ms}ms`);
 });
 
 // Healthcheck
@@ -73,7 +73,7 @@ for (const service of services) {
 }
 
 log
-  .withContext({
+  .withMetadata({
     services: services.map((s) => ({
       name: s.name,
       description: s.description,
