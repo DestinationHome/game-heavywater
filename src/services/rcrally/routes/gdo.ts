@@ -243,7 +243,7 @@ export function gdoRoutes(app: Hono) {
                 effects: "",
               },
               {
-                "@_id": 2,
+                "@_id": 1,
                 name: questName,
                 description: questName,
                 space: "heavywater_rcrally_game",
@@ -260,7 +260,7 @@ export function gdoRoutes(app: Hono) {
               "@_id": 1,
               name: "Exit 1",
               description: "Exit 1",
-              exitLogic: "1 or 2",
+              exitLogic: "1",
               end: true,
               next: 0,
               position: 0,

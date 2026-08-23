@@ -198,6 +198,6 @@ describe("RC Rally & GDO Endpoints", () => {
     expect(groupText).toContain('<task id="1">');
     expect(groupText).toContain("<exitBlocks>");
     expect(groupText).toContain('<exitBlock id="1">');
-    expect(groupText).toContain("<exitLogic>1 or 2</exitLogic>");
+    expect(groupText).toContain("<exitLogic>1</exitLogic>");
   });
 });
