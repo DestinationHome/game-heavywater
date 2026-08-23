@@ -131,6 +131,9 @@ export function gdoRoutes(app: Hono) {
     const questsNode = {
       quest: RCR_ALL_QUESTS.map((name, index) => ({
         "@_id": index + 1,
+        attributes: {
+          id: index + 1,
+        },
         name,
         description: name,
         failure: "Failed",
@@ -148,8 +151,12 @@ export function gdoRoutes(app: Hono) {
 
     const completedQuests = objKeys.map((name, i) => {
       const idx = RCR_ALL_QUESTS.indexOf(name);
+      const id = idx !== -1 ? idx + 1 : i + 1;
       return {
-        "@_id": idx !== -1 ? idx + 1 : i + 1,
+        "@_id": id,
+        attributes: {
+          id,
+        },
         status: "completed",
         shared: false,
         group: 1,
@@ -178,6 +185,9 @@ export function gdoRoutes(app: Hono) {
         publishers: {
           publisher: {
             "@_id": 12,
+            attributes: {
+              id: 12,
+            },
             groups: "",
             quests: questsNode,
           },
@@ -191,6 +201,9 @@ export function gdoRoutes(app: Hono) {
             scenes: {
               scene: {
                 "@_id": space,
+                attributes: {
+                  id: space,
+                },
                 spent_duration: 0,
                 times_entered: 0,
               },
@@ -223,16 +236,25 @@ export function gdoRoutes(app: Hono) {
         status: "success",
         group: {
           "@_id": groupId,
+          attributes: {
+            id: groupId,
+          },
           name: questName,
           description: questName,
           quest: {
             "@_id": groupId,
+            attributes: {
+              id: groupId,
+            },
           },
           initial: true,
           tasks: {
             task: [
               {
                 "@_id": 1,
+                attributes: {
+                  id: 1,
+                },
                 name: questName,
                 description: questName,
                 space: "destinations_indie",
@@ -244,6 +266,9 @@ export function gdoRoutes(app: Hono) {
               },
               {
                 "@_id": 1,
+                attributes: {
+                  id: 1,
+                },
                 name: questName,
                 description: questName,
                 space: "heavywater_rcrally_game",
@@ -258,6 +283,9 @@ export function gdoRoutes(app: Hono) {
           exitBlocks: {
             exitBlock: {
               "@_id": 1,
+              attributes: {
+                id: 1,
+              },
               name: "Exit 1",
               description: "Exit 1",
               exitLogic: "1",
