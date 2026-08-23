@@ -184,4 +184,20 @@ describe("RC Rally & GDO Endpoints", () => {
     const syncText = await syncRes.text();
     expect(syncText).toContain("<status>success</status>");
   });
+
+  it("GET /user/group returns valid group, tasks, and exit block schema", async () => {
+    const groupRes = await app.fetch(
+      new Request(
+        `http://localhost/user/group/1/it-IT/${testUser}/`,
+      ),
+    );
+    expect(groupRes.status).toBe(200);
+    const groupText = await groupRes.text();
+    expect(groupText).toContain('<group id="1">');
+    expect(groupText).toContain("<tasks>");
+    expect(groupText).toContain('<task id="1">');
+    expect(groupText).toContain("<exitBlocks>");
+    expect(groupText).toContain('<exitBlock id="1">');
+    expect(groupText).toContain("<exitLogic>1 or 2</exitLogic>");
+  });
 });
