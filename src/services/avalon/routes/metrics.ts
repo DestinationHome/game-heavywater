@@ -1,7 +1,7 @@
-import type { Context, Hono } from "hono";
 import { log } from "@main";
-import { db, avalonMetrics } from "../../../db";
-import { apiSuccess, apiError } from "../../../common/response";
+import type { Context, Hono } from "hono";
+import { apiError, apiSuccess } from "../../../common/response";
+import { avalonMetrics, db } from "../../../db";
 
 export function metricsRoutes(app: Hono) {
   // PUT or POST /D2O/Avalon/metrics
@@ -18,7 +18,9 @@ export function metricsRoutes(app: Hono) {
         createdAt: Date.now(),
       });
 
-      log.info(`[AVALON METRICS] Received telemetry event from ${uuid || "anonymous"}`);
+      log.info(
+        `[AVALON METRICS] Received telemetry event from ${uuid || "anonymous"}`,
+      );
       return apiSuccess(c, {});
     } catch (err) {
       log.withError(err).error("[AVALON METRICS] Failed to record metrics");

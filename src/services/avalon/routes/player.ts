@@ -1,8 +1,8 @@
-import type { Context, Hono } from "hono";
-import { eq } from "drizzle-orm";
 import { log } from "@main";
-import { db, avalonPlayers } from "../../../db";
-import { apiSuccess, apiError } from "../../../common/response";
+import { eq } from "drizzle-orm";
+import type { Context, Hono } from "hono";
+import { apiError, apiSuccess } from "../../../common/response";
+import { avalonPlayers, db } from "../../../db";
 
 export const defaultHouseData = {
   House: {
@@ -29,7 +29,9 @@ export interface AvalonPlayerDataStore {
   D2OData: typeof defaultD2OData;
 }
 
-async function getOrCreateAvalonPlayer(uuid: string): Promise<AvalonPlayerDataStore> {
+async function getOrCreateAvalonPlayer(
+  uuid: string,
+): Promise<AvalonPlayerDataStore> {
   const existing = await db
     .select()
     .from(avalonPlayers)
@@ -45,9 +47,7 @@ async function getOrCreateAvalonPlayer(uuid: string): Promise<AvalonPlayerDataSt
       MyAvalonKeepData: existing.myAvalonKeepData
         ? JSON.parse(existing.myAvalonKeepData)
         : defaultMyAvalonKeepData,
-      D2OData: existing.d2oData
-        ? JSON.parse(existing.d2oData)
-        : defaultD2OData,
+      D2OData: existing.d2oData ? JSON.parse(existing.d2oData) : defaultD2OData,
     };
   }
 
@@ -71,7 +71,10 @@ async function getOrCreateAvalonPlayer(uuid: string): Promise<AvalonPlayerDataSt
 
 type AvalonDataTypeKey = keyof Omit<AvalonPlayerDataStore, "uuid">;
 
-const columnMap: Record<AvalonDataTypeKey, keyof typeof avalonPlayers.$inferSelect> = {
+const columnMap: Record<
+  AvalonDataTypeKey,
+  keyof typeof avalonPlayers.$inferSelect
+> = {
   HouseData: "houseData",
   MyAvalonKeepData: "myAvalonKeepData",
   D2OData: "d2oData",
@@ -87,13 +90,17 @@ export function playerRoutes(app: Hono) {
       const data = player[dataType];
 
       if (!data) {
-        log.warn(`[AVALON] Unknown dataType requested: ${dataType} for ${uuid}`);
+        log.warn(
+          `[AVALON] Unknown dataType requested: ${dataType} for ${uuid}`,
+        );
         return apiSuccess(c, {});
       }
 
       return apiSuccess(c, data);
     } catch (err) {
-      log.withError(err).error(`[AVALON] Failed to get ${dataType} for ${uuid}`);
+      log
+        .withError(err)
+        .error(`[AVALON] Failed to get ${dataType} for ${uuid}`);
       return apiError(c, "Failed to load player data", 500);
     }
   };
@@ -110,7 +117,10 @@ export function playerRoutes(app: Hono) {
       let payload = body;
       if (dataType === "HouseData" && body.House === undefined) {
         payload = { House: body };
-      } else if (dataType === "MyAvalonKeepData" && body.KeepData === undefined) {
+      } else if (
+        dataType === "MyAvalonKeepData" &&
+        body.KeepData === undefined
+      ) {
         payload = { KeepData: body };
       } else if (dataType === "D2OData" && body.PersonalData === undefined) {
         payload = { PersonalData: body };
@@ -131,7 +141,9 @@ export function playerRoutes(app: Hono) {
       log.info(`[AVALON] Updated ${dataType} for player ${uuid}`);
       return apiSuccess(c, payload);
     } catch (err) {
-      log.withError(err).error(`[AVALON] Failed to save ${dataType} for ${uuid}`);
+      log
+        .withError(err)
+        .error(`[AVALON] Failed to save ${dataType} for ${uuid}`);
       return apiError(c, "Failed to save player data", 500);
     }
   };

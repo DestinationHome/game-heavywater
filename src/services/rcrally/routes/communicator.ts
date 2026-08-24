@@ -1,8 +1,8 @@
-import type { Context, Hono } from "hono";
 import { log } from "@main";
+import type { Context, Hono } from "hono";
 import { apiXml, parseXml } from "../../../common/xml";
+import { handleObjectives, handleParts, handleTimes } from "../handlers";
 import { getUserData, saveUserData } from "../store";
-import { handleTimes, handleParts, handleObjectives } from "../handlers";
 import type { RcRallyUserData } from "../types";
 
 export function communicatorRoutes(app: Hono) {
@@ -11,7 +11,9 @@ export function communicatorRoutes(app: Hono) {
     const user = c.req.query("user");
     const venue = c.req.query("venue");
     const award = c.req.query("award");
-    log.info(`[HEAVYWATER GET] path=${c.req.path} user=${user ?? "-"} venue=${venue ?? "-"} award=${award ?? "-"}`);
+    log.info(
+      `[HEAVYWATER GET] path=${c.req.path} user=${user ?? "-"} venue=${venue ?? "-"} award=${award ?? "-"}`,
+    );
     return apiXml(c, {
       root: {
         status: "success",
@@ -52,7 +54,9 @@ async function handleCommunicatorPost(c: Context) {
     try {
       parsed = parseXml(raw);
     } catch (err) {
-      log.withError(err).warn("Failed to parse Heavy Water Communicator XML body");
+      log
+        .withError(err)
+        .warn("Failed to parse Heavy Water Communicator XML body");
     }
   }
 

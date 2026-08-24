@@ -1,7 +1,7 @@
-import type { Context, Hono } from "hono";
 import { log } from "@main";
+import type { Context, Hono } from "hono";
+import { apiError, apiSuccess } from "../../../common/response";
 import { db, emorayMetrics } from "../../../db";
-import { apiSuccess, apiError } from "../../../common/response";
 
 export function metricsRoutes(app: Hono) {
   // PUT or POST /D2O/EmoRay/metrics
@@ -18,7 +18,9 @@ export function metricsRoutes(app: Hono) {
         createdAt: Date.now(),
       });
 
-      log.info(`[METRICS] Received telemetry event from ${uuid || "anonymous"}`);
+      log.info(
+        `[METRICS] Received telemetry event from ${uuid || "anonymous"}`,
+      );
       return apiSuccess(c, {});
     } catch (err) {
       log.withError(err).error("Failed to record metrics");

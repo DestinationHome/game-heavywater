@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "start": "bun run src/index.ts",
-    "lint": "biome lint"
+    "lint": "biome lint",
+    "test": "bun test"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.8.0",

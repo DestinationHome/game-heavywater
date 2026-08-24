@@ -1,5 +1,5 @@
 import type { RcRallyUserData } from "./types";
-import { toArray, num } from "./utils";
+import { num, toArray } from "./utils";
 
 type XmlNode = Record<string, unknown>;
 

@@ -1,8 +1,8 @@
-import type { Context, Hono } from "hono";
-import { eq } from "drizzle-orm";
 import { log } from "@main";
-import { db, avalonContributions } from "../../../db";
-import { apiSuccess, apiError } from "../../../common/response";
+import { eq } from "drizzle-orm";
+import type { Context, Hono } from "hono";
+import { apiError, apiSuccess } from "../../../common/response";
+import { avalonContributions, db } from "../../../db";
 
 export function contributionsRoutes(app: Hono) {
   // GET /D2O/Avalon/contributions
@@ -48,7 +48,9 @@ export function contributionsRoutes(app: Hono) {
         });
       }
 
-      log.info(`[AVALON] Updated crystal contribution: House=${house}, Amount=${amount}`);
+      log.info(
+        `[AVALON] Updated crystal contribution: House=${house}, Amount=${amount}`,
+      );
       return apiSuccess(c, {
         Contribution: { House: house, Amount: amount },
       });

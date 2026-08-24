@@ -1,4 +1,4 @@
-import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
+import { DiagConsoleLogger, DiagLogLevel, diag } from "@opentelemetry/api";
 import { logs } from "@opentelemetry/api-logs";
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";

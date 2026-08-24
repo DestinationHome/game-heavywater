@@ -1,7 +1,7 @@
-import type { Context, Hono } from "hono";
 import { log } from "@main";
+import type { Context, Hono } from "hono";
+import { apiError, apiSuccess } from "../../../common/response";
 import { db, heavywaterPublicMetrics } from "../../../db";
-import { apiSuccess, apiError } from "../../../common/response";
 
 export function metricsRoutes(app: Hono) {
   // PUT & POST /D2O/HeavyWaterPublic/metrics
@@ -23,7 +23,9 @@ export function metricsRoutes(app: Hono) {
       );
       return apiSuccess(c, {});
     } catch (err) {
-      log.withError(err).error("[HEAVYWATER PUBLIC METRICS] Failed to record metrics");
+      log
+        .withError(err)
+        .error("[HEAVYWATER PUBLIC METRICS] Failed to record metrics");
       return apiError(c, "Failed to record metrics", 500);
     }
   };

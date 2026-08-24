@@ -1,8 +1,9 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import app from "../src/index";
 
 describe("EmoRay API Endpoints", () => {
-  const getUniqueUuid = () => `test_player_${Math.random().toString(36).slice(2, 10)}`;
+  const getUniqueUuid = () =>
+    `test_player_${Math.random().toString(36).slice(2, 10)}`;
 
   it("Health check returns ok", async () => {
     const res = await app.fetch(new Request("http://localhost/health"));

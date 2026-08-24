@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import app from "../src/index";
 
 describe("RC Rally & GDO Endpoints", () => {
@@ -16,9 +16,7 @@ describe("RC Rally & GDO Endpoints", () => {
   });
 
   it("GET /publisher/list returns valid XML with publisher ID 12", async () => {
-    const res = await app.fetch(
-      new Request("http://localhost/publisher/list"),
-    );
+    const res = await app.fetch(new Request("http://localhost/publisher/list"));
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("text/xml");
     const text = await res.text();
@@ -29,9 +27,7 @@ describe("RC Rally & GDO Endpoints", () => {
 
   it("GET /user/game returns default times when user has no races", async () => {
     const res = await app.fetch(
-      new Request(
-        `http://localhost/user/game/12/7/en_US/${testUser}`,
-      ),
+      new Request(`http://localhost/user/game/12/7/en_US/${testUser}`),
     );
     expect(res.status).toBe(200);
     const text = await res.text();
@@ -84,9 +80,7 @@ describe("RC Rally & GDO Endpoints", () => {
 
     // Verify times updated in user game data
     const gameRes = await app.fetch(
-      new Request(
-        `http://localhost/user/game/12/7/en_US/${testUser}`,
-      ),
+      new Request(`http://localhost/user/game/12/7/en_US/${testUser}`),
     );
     const gameText = await gameRes.text();
     expect(gameText).toContain("<Track1_Times>62500</Track1_Times>");
@@ -137,9 +131,7 @@ describe("RC Rally & GDO Endpoints", () => {
 
     // Verify user/game contains compressed Parts and Objectives
     const gameRes = await app.fetch(
-      new Request(
-        `http://localhost/user/game/12/7/en_US/${testUser}`,
-      ),
+      new Request(`http://localhost/user/game/12/7/en_US/${testUser}`),
     );
     const gameText = await gameRes.text();
     expect(gameText).toContain("<Objectives>17</Objectives>");
@@ -172,13 +164,10 @@ describe("RC Rally & GDO Endpoints", () => {
     expect(spaceText).toContain("<status>completed</status>");
 
     const syncRes = await app.fetch(
-      new Request(
-        `http://localhost/user/sync/US/${testUser}`,
-        {
-          method: "POST",
-          body: "<sync>data</sync>",
-        },
-      ),
+      new Request(`http://localhost/user/sync/US/${testUser}`, {
+        method: "POST",
+        body: "<sync>data</sync>",
+      }),
     );
     expect(syncRes.status).toBe(200);
     const syncText = await syncRes.text();
@@ -187,9 +176,7 @@ describe("RC Rally & GDO Endpoints", () => {
 
   it("GET /user/group returns valid group, tasks, and exit block schema", async () => {
     const groupRes = await app.fetch(
-      new Request(
-        `http://localhost/user/group/1/it-IT/${testUser}/`,
-      ),
+      new Request(`http://localhost/user/group/1/it-IT/${testUser}/`),
     );
     expect(groupRes.status).toBe(200);
     const groupText = await groupRes.text();

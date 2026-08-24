@@ -30,12 +30,10 @@
   - Session metrics & score tracking
   - Controller camera & sensitivity configurations
   - Global arcade cabinet leaderboards
-- [x] **RC Rally** (SCEA Destinations GDO & Communicator)
-  - Publisher listing and token verification
-  - Track lap times & split times
-  - Car parts loadouts & quest objectives (BigInt bit compressed)
-  - Global leaderboard rankings
-  - User synchronization
+- [x] **RC Rally** (Heavy Water Communicator)
+  - Track lap times & split times (`SERVICE: Times`)
+  - Car parts loadouts & customizations (`SERVICE: Parts`)
+  - Race objective triggers (`SERVICE: Objectives`)
 - [x] **Avalon Keep & Avalon Faire** (Heavy Water Apartment & Space)
   - House Banner selection (Dragon vs. Lion)
   - Avalon Keep state persistence (`MyAvalonKeepData`)
@@ -60,7 +58,6 @@ Route the following domains through your DNS / reverse proxy to this container (
 | :--- | :--- | :--- |
 | `services.heavyh2o.net` | HTTP | EmoRay progression, equipped, scores, and RC Rally Communicator XML |
 | `secure.heavyh2o.net` | HTTPS | PlayStation Network Ticket Validation (`/D2O/Ticket/validate/*`) |
-| `destinations.destinationhome.live` | HTTP | RC Rally Destinations GDO endpoints (`/publisher/list`, `/user/game/*`, `/leaderboard/*`) |
 | `www.services.heavyh2o.net` | HTTP | Client fallback / standard base URL |
 
 > [!TIP]

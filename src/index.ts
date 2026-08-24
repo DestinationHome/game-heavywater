@@ -7,11 +7,10 @@ import { Hono } from "hono";
 import { LogLayer } from "loglayer";
 import pino from "pino";
 import { serializeError } from "serialize-error";
-
-import { EmoRayService } from "./services/emoray/service";
-import { RcRallyService } from "./services/rcrally/service";
 import { AvalonService } from "./services/avalon/service";
+import { EmoRayService } from "./services/emoray/service";
 import { HeavyWaterPublicService } from "./services/public/service";
+import { RcRallyService } from "./services/rcrally/service";
 
 const app = new Hono();
 

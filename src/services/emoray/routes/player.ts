@@ -1,14 +1,14 @@
-import type { Context, Hono } from "hono";
-import { eq } from "drizzle-orm";
 import { log } from "@main";
+import { eq } from "drizzle-orm";
+import type { Context, Hono } from "hono";
+import { apiError, apiSuccess } from "../../../common/response";
 import { db, emorayPlayers } from "../../../db";
-import { apiSuccess, apiError } from "../../../common/response";
 import {
-  defaultProgressionData,
-  defaultEquippedData,
-  defaultStoreProgressData,
   defaultControllerData,
+  defaultEquippedData,
+  defaultProgressionData,
   defaultScoresData,
+  defaultStoreProgressData,
 } from "../../../defaults/progressDefaults";
 
 export interface PlayerDataStore {
@@ -75,13 +75,14 @@ async function getOrCreatePlayer(uuid: string): Promise<PlayerDataStore> {
 
 type DataTypeKey = keyof Omit<PlayerDataStore, "uuid">;
 
-const columnMap: Record<DataTypeKey, keyof typeof emorayPlayers.$inferSelect> = {
-  ProgressionData: "progressionData",
-  EquippedData: "equippedData",
-  StoreProgressData: "storeProgressData",
-  ControllerData: "controllerData",
-  ScoresData: "scoresData",
-};
+const columnMap: Record<DataTypeKey, keyof typeof emorayPlayers.$inferSelect> =
+  {
+    ProgressionData: "progressionData",
+    EquippedData: "equippedData",
+    StoreProgressData: "storeProgressData",
+    ControllerData: "controllerData",
+    ScoresData: "scoresData",
+  };
 
 export function playerRoutes(app: Hono) {
   const handleGetData = async (c: Context) => {
@@ -128,7 +129,10 @@ export function playerRoutes(app: Hono) {
         payload = { Scores: body };
       } else if (dataType === "ControllerData" && body.Config === undefined) {
         payload = { Config: body };
-      } else if (dataType === "StoreProgressData" && body.StoreProgress === undefined) {
+      } else if (
+        dataType === "StoreProgressData" &&
+        body.StoreProgress === undefined
+      ) {
         payload = { StoreProgress: body };
       }
 
