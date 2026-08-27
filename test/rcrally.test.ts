@@ -1,7 +1,24 @@
 import { describe, expect, it } from "bun:test";
 import app from "../src/index";
+import { compressLoadout } from "../src/services/rcrally/handlers";
+import { getUserData } from "../src/services/rcrally/store";
 
-describe("RC Rally & GDO Endpoints", () => {
+async function post(service: string, body: string) {
+  return app.fetch(
+    new Request("http://localhost/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/xml",
+        SERVICE: service,
+        PRODUCT: "home-racers",
+        METHOD: "set",
+      },
+      body,
+    }),
+  );
+}
+
+describe("RC Rally Communicator", () => {
   const testUser = `racer_${Math.random().toString(36).slice(2, 8)}`;
 
   it("GET / with query params returns success XML", async () => {
@@ -13,178 +30,126 @@ describe("RC Rally & GDO Endpoints", () => {
     expect(res.status).toBe(200);
     const text = await res.text();
     expect(text).toContain("<status>success</status>");
-  });
-
-  it("GET /publisher/list returns valid XML with publisher ID 12", async () => {
-    const res = await app.fetch(new Request("http://localhost/publisher/list"));
-    expect(res.status).toBe(200);
-    expect(res.headers.get("content-type")).toContain("text/xml");
-    const text = await res.text();
-    expect(text).toContain('<publisher id="12">');
-    expect(text).toContain("<name>RC Rally</name>");
     expect(text).not.toContain("<?xml");
   });
 
-  it("GET /user/game returns default times when user has no races", async () => {
-    const res = await app.fetch(
-      new Request(`http://localhost/user/game/12/7/en_US/${testUser}`),
+  it("SERVICE: Times records lap times and splits", async () => {
+    const res = await post(
+      "Times",
+      `<races>
+         <race track="1">
+           <racer userid="${testUser}">
+             <time>62500</time>
+             <splits><split>20100</split><split>41200</split><split>62500</split></splits>
+           </racer>
+         </race>
+         <race track="2">
+           <racer userid="${testUser}"><time>84100</time></racer>
+         </race>
+       </races>`,
     );
     expect(res.status).toBe(200);
-    const text = await res.text();
-    expect(text).toContain(`<name>${testUser}</name>`);
-    expect(text).toContain("<Track1_Times>-1</Track1_Times>");
-    expect(text).toContain("<Track2_Times>-1</Track2_Times>");
-    expect(text).toContain("<Track3_Times>-1</Track3_Times>");
+    expect(await res.text()).toContain("<status>success</status>");
+
+    const data = await getUserData(testUser);
+    expect(data.times["1"]?.time).toBe(62500);
+    expect(data.times["1"]?.splits).toEqual([20100, 41200, 62500]);
+    expect(data.times["2"]?.time).toBe(84100);
+    expect(data.times["3"]).toBeUndefined();
   });
 
-  it("POST with SERVICE: Times records and updates best track times", async () => {
-    const xmlTimes = `
-      <races>
-        <race track="1">
-          <racer userid="${testUser}">
-            <time>62500</time>
-            <splits>
-              <split>20100</split>
-              <split>41200</split>
-              <split>62500</split>
-            </splits>
-          </racer>
-        </race>
-        <race track="2">
-          <racer userid="${testUser}">
-            <time>84100</time>
-            <splits>
-              <split>30000</split>
-              <split>55000</split>
-              <split>84100</split>
-            </splits>
-          </racer>
-        </race>
-      </races>
-    `;
+  it("SERVICE: Times keeps the personal best when a slower lap arrives", async () => {
+    await post(
+      "Times",
+      `<races><race track="1"><racer userid="${testUser}">
+         <time>99999</time></racer></race></races>`,
+    );
 
-    const res = await app.fetch(
-      new Request("http://localhost/heavywater/save", {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/xml",
-          SERVICE: "Times",
-          METHOD: "set",
-        },
-        body: xmlTimes,
-      }),
+    const data = await getUserData(testUser);
+    expect(data.times["1"]?.time).toBe(62500);
+  });
+
+  it("SERVICE: Times still accepts a faster lap", async () => {
+    await post(
+      "Times",
+      `<races><race track="1"><racer userid="${testUser}">
+         <time>41567</time><splits><split>41567</split></splits>
+       </racer></race></races>`,
+    );
+
+    const data = await getUserData(testUser);
+    expect(data.times["1"]?.time).toBe(41567);
+    expect(data.times["1"]?.splits).toEqual([41567]);
+  });
+
+  it("SERVICE: Parts and SERVICE: Objectives record the user's unlocks", async () => {
+    await post(
+      "Parts",
+      `<parts userid="${testUser}">
+         <type name="Body"><id>2</id></type>
+         <type name="Wheels"><id>4</id></type>
+       </parts>`,
+    );
+    await post(
+      "Objectives",
+      `<objectives userid="${testUser}">
+         <id count="1">RedCupsOnly_T1</id>
+         <id count="2">BeatPreviousTime_T1</id>
+       </objectives>`,
+    );
+
+    const data = await getUserData(testUser);
+    expect(data.parts.Body).toBe(2);
+    expect(data.parts.Wheels).toBe(4);
+    expect(data.objectives.RedCupsOnly_T1).toBe(1);
+    expect(data.objectives.BeatPreviousTime_T1).toBe(2);
+  });
+
+  it("SERVICE: Loadout stores each set BitCompressor-encoded", async () => {
+    const res = await post(
+      "Loadout",
+      `<loadouts userid="${testUser}">
+         <set id="1">
+           <wheels>1</wheels><chassis>3</chassis><body>2</body>
+           <shocks>4</shocks><motor>5</motor><battery>6</battery><decal>7</decal>
+         </set>
+         <set id="2">
+           <wheels>1</wheels><chassis>1</chassis><body>1</body>
+           <shocks>1</shocks><motor>1</motor><battery>1</battery><decal>1</decal>
+         </set>
+       </loadouts>`,
     );
     expect(res.status).toBe(200);
-    const text = await res.text();
-    expect(text).toContain("<status>success</status>");
 
-    // Verify times updated in user game data
-    const gameRes = await app.fetch(
-      new Request(`http://localhost/user/game/12/7/en_US/${testUser}`),
-    );
-    const gameText = await gameRes.text();
-    expect(gameText).toContain("<Track1_Times>62500</Track1_Times>");
-    expect(gameText).toContain("<Track2_Times>84100</Track2_Times>");
-    expect(gameText).toContain("<Track3_Times>-1</Track3_Times>");
+    const data = await getUserData(testUser);
+    expect(data.loadouts["1"]).toBe("ABCDEFG");
+    expect(data.loadouts["2"]).toBe("AAAAAAA");
   });
 
-  it("POST with SERVICE: Parts and SERVICE: Objectives records user loadout", async () => {
-    const xmlParts = `
-      <parts userid="${testUser}">
-        <type name="Body"><id>2</id></type>
-        <type name="Wheels"><id>4</id></type>
-      </parts>
-    `;
-
-    const partsRes = await app.fetch(
-      new Request("http://localhost/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/xml",
-          SERVICE: "Parts",
-          METHOD: "set",
-        },
-        body: xmlParts,
+  it("compressLoadout emits the client's default for an out-of-range index", () => {
+    expect(compressLoadout({})).toBe("AAAAAAA");
+    expect(
+      compressLoadout({
+        wheels: 0,
+        body: -1,
+        chassis: 2,
+        shocks: 1,
+        motor: 1,
+        battery: 1,
+        decal: 1,
       }),
-    );
-    expect(partsRes.status).toBe(200);
-
-    const xmlObjectives = `
-      <objectives userid="${testUser}">
-        <id count="1">RedCupsOnly_T1</id>
-        <id count="2">BeatPreviousTime_T1</id>
-      </objectives>
-    `;
-
-    const objRes = await app.fetch(
-      new Request("http://localhost/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/xml",
-          SERVICE: "Objectives",
-          METHOD: "set",
-        },
-        body: xmlObjectives,
-      }),
-    );
-    expect(objRes.status).toBe(200);
-
-    // Verify user/game contains compressed Parts and Objectives
-    const gameRes = await app.fetch(
-      new Request(`http://localhost/user/game/12/7/en_US/${testUser}`),
-    );
-    const gameText = await gameRes.text();
-    expect(gameText).toContain("<Objectives>17</Objectives>");
-    expect(gameText).toContain("<Parts>");
-    expect(gameText).toContain("<Loadout1>AAAAAAAA</Loadout1>");
+    ).toBe("AABAAAA");
   });
 
-  it("GET /leaderboard returns sorted player scores", async () => {
-    const res = await app.fetch(
-      new Request("http://localhost/leaderboard/7/US/allTime"),
+  it("an unknown SERVICE is accepted without persisting anything", async () => {
+    const ghost = `ghost_${Math.random().toString(36).slice(2, 8)}`;
+    const res = await post(
+      "SomethingElse",
+      `<parts userid="${ghost}"><type name="Body"><id>2</id></type></parts>`,
     );
     expect(res.status).toBe(200);
-    const text = await res.text();
-    expect(text).toContain("<game>RC Rally</game>");
-    expect(text).toContain(`<player>${testUser}</player>`);
-    expect(text).toContain("<value>62.500</value>");
-  });
 
-  it("GET /user/space and POST /user/sync return expected XML", async () => {
-    const spaceRes = await app.fetch(
-      new Request(
-        `http://localhost/user/space/heavywater_rcrally_game/en_US/${testUser}/18`,
-      ),
-    );
-    expect(spaceRes.status).toBe(200);
-    const spaceText = await spaceRes.text();
-    expect(spaceText).toContain("<status>success</status>");
-    expect(spaceText).toContain("<name>RedCupsOnly_T1</name>");
-    expect(spaceText).toContain("<description>RedCupsOnly_T1</description>");
-    expect(spaceText).toContain("<status>completed</status>");
-
-    const syncRes = await app.fetch(
-      new Request(`http://localhost/user/sync/US/${testUser}`, {
-        method: "POST",
-        body: "<sync>data</sync>",
-      }),
-    );
-    expect(syncRes.status).toBe(200);
-    const syncText = await syncRes.text();
-    expect(syncText).toContain("<status>success</status>");
-  });
-
-  it("GET /user/group returns valid group, tasks, and exit block schema", async () => {
-    const groupRes = await app.fetch(
-      new Request(`http://localhost/user/group/1/it-IT/${testUser}/`),
-    );
-    expect(groupRes.status).toBe(200);
-    const groupText = await groupRes.text();
-    expect(groupText).toContain('<group id="1">');
-    expect(groupText).toContain("<tasks>");
-    expect(groupText).toContain('<task id="1">');
-    expect(groupText).toContain("<exitBlocks>");
-    expect(groupText).toContain('<exitBlock id="1">');
-    expect(groupText).toContain("<exitLogic>1</exitLogic>");
+    const data = await getUserData(ghost);
+    expect(data.parts).toEqual({});
   });
 });

@@ -3,6 +3,18 @@ import { num, toArray } from "./utils";
 
 type XmlNode = Record<string, unknown>;
 
+function userOf(
+  userMap: Map<string, RcRallyUserData>,
+  user: string,
+): RcRallyUserData {
+  let u = userMap.get(user);
+  if (!u) {
+    u = { times: {}, parts: {}, objectives: {}, loadouts: {} };
+    userMap.set(user, u);
+  }
+  return u;
+}
+
 /**
  * SERVICE: Times
  *
@@ -30,12 +42,7 @@ export function handleTimes(
       const time = num(racer?.time);
       if (!user || time <= 0) continue;
 
-      let u = userMap.get(user);
-      if (!u) {
-        u = { times: {}, parts: {}, objectives: {} };
-        userMap.set(user, u);
-      }
-
+      const u = userOf(userMap, user);
       const prev = u.times[track];
       if (!prev || time < prev.time) {
         const splitsNode = racer?.splits as XmlNode | undefined;
@@ -66,11 +73,7 @@ export function handleParts(
   const user = String(p?.["@_userid"] ?? "");
   if (!user) return;
 
-  let u = userMap.get(user);
-  if (!u) {
-    u = { times: {}, parts: {}, objectives: {} };
-    userMap.set(user, u);
-  }
+  const u = userOf(userMap, user);
 
   for (const typeNode of toArray(p?.type)) {
     const t = typeNode as XmlNode;
@@ -97,16 +100,61 @@ export function handleObjectives(
   const user = String(o?.["@_userid"] ?? "");
   if (!user) return;
 
-  let u = userMap.get(user);
-  if (!u) {
-    u = { times: {}, parts: {}, objectives: {} };
-    userMap.set(user, u);
-  }
+  const u = userOf(userMap, user);
 
   for (const idNode of toArray(o?.id)) {
     const isObj = idNode !== null && typeof idNode === "object";
     const idObj = idNode as XmlNode;
     const key = String(isObj ? (idObj["#text"] ?? "") : idNode);
     if (key) u.objectives[key] = num(isObj ? (idObj["@_count"] ?? 1) : 1);
+  }
+}
+
+const LOADOUT_SLOT_ORDER = [
+  "wheels",
+  "body",
+  "chassis",
+  "shocks",
+  "motor",
+  "battery",
+  "decal",
+] as const;
+
+export function compressLoadout(set: XmlNode): string {
+  let out = "";
+  for (const slot of LOADOUT_SLOT_ORDER) {
+    const index = num(set?.[slot]);
+    out += index >= 1 && index <= 58 ? String.fromCharCode(index + 64) : "A";
+  }
+  return out;
+}
+
+/**
+ * SERVICE: Loadout
+ *
+ * ```xml
+ * <loadouts userid="U">
+ *   <set id="1">
+ *     <wheels>1</wheels><chassis>3</chassis><body>2</body>
+ *     <shocks>1</shocks><motor>1</motor><battery>1</battery><decal>1</decal>
+ *   </set>
+ * </loadouts>
+ * ```
+ */
+export function handleLoadout(
+  xml: XmlNode,
+  userMap: Map<string, RcRallyUserData>,
+): void {
+  const l = xml.loadouts as XmlNode | undefined;
+  const user = String(l?.["@_userid"] ?? "");
+  if (!user) return;
+
+  const u = userOf(userMap, user);
+
+  for (const setNode of toArray(l?.set)) {
+    const set = setNode as XmlNode;
+    const id = String(set?.["@_id"] ?? "");
+    if (!id) continue;
+    u.loadouts[id] = compressLoadout(set);
   }
 }

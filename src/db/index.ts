@@ -40,10 +40,15 @@ sqlite.run(`
     times TEXT,
     parts TEXT,
     objectives TEXT,
+    loadouts TEXT,
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL
   );
 `);
+
+try {
+  sqlite.run(`ALTER TABLE rcrally_users ADD COLUMN loadouts TEXT`);
+} catch {}
 
 sqlite.run(`
   CREATE TABLE IF NOT EXISTS avalon_players (

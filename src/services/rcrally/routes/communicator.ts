@@ -1,7 +1,12 @@
 import { log } from "@main";
 import type { Context, Hono } from "hono";
 import { apiXml, parseXml } from "../../../common/xml";
-import { handleObjectives, handleParts, handleTimes } from "../handlers";
+import {
+  handleLoadout,
+  handleObjectives,
+  handleParts,
+  handleTimes,
+} from "../handlers";
 import { getUserData, saveUserData } from "../store";
 import type { RcRallyUserData } from "../types";
 
@@ -71,20 +76,31 @@ async function handleCommunicatorPost(c: Context) {
         handleParts(parsed, userMap);
       } else if (service === "Objectives") {
         handleObjectives(parsed, userMap);
+      } else if (service === "Loadout") {
+        handleLoadout(parsed, userMap);
       }
 
       // Persist changes to SQLite
       for (const [user, updatedData] of userMap.entries()) {
         const existing = await getUserData(user);
-        if (updatedData.times) {
-          Object.assign(existing.times, updatedData.times);
+
+        for (const [track, lap] of Object.entries(updatedData.times ?? {})) {
+          const prev = existing.times[track];
+          if (!prev || lap.time < prev.time) {
+            existing.times[track] = lap;
+          }
         }
+
         if (updatedData.parts) {
           Object.assign(existing.parts, updatedData.parts);
         }
         if (updatedData.objectives) {
           Object.assign(existing.objectives, updatedData.objectives);
         }
+        if (updatedData.loadouts) {
+          Object.assign(existing.loadouts, updatedData.loadouts);
+        }
+
         await saveUserData(user, existing);
         log.info(`[RCRALLY] Saved ${service} for player: ${user}`);
       }

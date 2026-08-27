@@ -24,6 +24,7 @@ export const rcrallyUsers = sqliteTable("rcrally_users", {
   times: text("times"), // JSON: Record<string, { time: number; splits: number[] }>
   parts: text("parts"), // JSON: Record<string, number>
   objectives: text("objectives"), // JSON: Record<string, number>
+  loadouts: text("loadouts"),
   createdAt: integer("created_at").notNull(),
   updatedAt: integer("updated_at").notNull(),
 });
