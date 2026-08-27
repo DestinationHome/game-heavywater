@@ -14,6 +14,7 @@ export async function getUserData(username: string): Promise<RcRallyUserData> {
       times: record.times ? JSON.parse(record.times) : {},
       parts: record.parts ? JSON.parse(record.parts) : {},
       objectives: record.objectives ? JSON.parse(record.objectives) : {},
+      loadouts: record.loadouts ? JSON.parse(record.loadouts) : {},
     };
   }
 
@@ -21,6 +22,7 @@ export async function getUserData(username: string): Promise<RcRallyUserData> {
     times: {},
     parts: {},
     objectives: {},
+    loadouts: {},
   };
 }
 
@@ -42,6 +44,7 @@ export async function saveUserData(
         times: JSON.stringify(data.times),
         parts: JSON.stringify(data.parts),
         objectives: JSON.stringify(data.objectives),
+        loadouts: JSON.stringify(data.loadouts),
         updatedAt: now,
       })
       .where(eq(rcrallyUsers.username, username));
@@ -51,6 +54,7 @@ export async function saveUserData(
       times: JSON.stringify(data.times),
       parts: JSON.stringify(data.parts),
       objectives: JSON.stringify(data.objectives),
+      loadouts: JSON.stringify(data.loadouts),
       createdAt: now,
       updatedAt: now,
     });
@@ -66,6 +70,7 @@ export async function getAllUsers(): Promise<Record<string, RcRallyUserData>> {
       times: record.times ? JSON.parse(record.times) : {},
       parts: record.parts ? JSON.parse(record.parts) : {},
       objectives: record.objectives ? JSON.parse(record.objectives) : {},
+      loadouts: record.loadouts ? JSON.parse(record.loadouts) : {},
     };
   }
 
